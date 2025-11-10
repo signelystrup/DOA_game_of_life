@@ -54,4 +54,17 @@ public class GamePanel extends JPanel implements Runnable{
         //game logic here
     }
 
+    @Override
+    public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
+
+
+        //bunny.draw(g2);
+
+
+        g2.dispose(); //good practice, Saves memory. (program still works without this line)
+
+    }
+
 }
