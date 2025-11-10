@@ -24,7 +24,7 @@ public class GamePanel extends JPanel implements Runnable{
 
         //bunnies:
         for (int i = 0 ; i < 5 ; i ++){
-            bunnies[i] = new Bunny(10 * i, 10 * i);
+            bunnies[i] = new Bunny(32 * i, 32 * i);
         }
 
     }
@@ -74,9 +74,6 @@ public class GamePanel extends JPanel implements Runnable{
                 bunnies[i].draw(g2);
             }
         }
-
-        g2.setColor(Color.BLACK);
-        g2.fillRect(100,100,100,100);
 
         g2.dispose(); //good practice, Saves memory. (program still works without this line)
 

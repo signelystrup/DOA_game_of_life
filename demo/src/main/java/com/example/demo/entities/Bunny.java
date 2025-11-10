@@ -20,7 +20,7 @@ public class Bunny extends Animal {
 
     @Override
     public void draw(Graphics2D g2){
-
+        g2.drawImage(sprite, x, y, 24, 24, null);
     }
 
     @Override
