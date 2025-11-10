@@ -1,5 +1,7 @@
 package com.example.demo.entities;
 
+import java.awt.*;
+
 public class Grass {
     protected int x, y;
     protected int gridX, gridY;
@@ -9,5 +11,11 @@ public class Grass {
         this.y = y;
         gridX = 0; //TODO: calculate.
         gridY = 0;
+    }
+
+    public void draw(Graphics2D g2){    }
+
+    public void update(){
+
     }
 }

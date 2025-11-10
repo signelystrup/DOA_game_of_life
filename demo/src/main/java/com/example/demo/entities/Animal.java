@@ -1,6 +1,7 @@
 package com.example.demo.entities;
 
-import java.util.Random;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Animal {
     protected int x, y;
@@ -13,18 +14,10 @@ public class Animal {
         this.y = y;
         gridX = 0; //TODO: calculate.
         gridY = 0;
-
-        Random random = new Random();
-        this.dx = calculateDx(random.nextDouble());
-        this.dy = calculateDy(this.dx);
     }
 
-    public double calculateDx(double dy){
-        return SPEED/dy;
-    }
+    public void draw(Graphics2D g2){}
 
-    public double calculateDy(double dx){
-        return SPEED/dx;
-    }
+    public void update(){}
 
 }
