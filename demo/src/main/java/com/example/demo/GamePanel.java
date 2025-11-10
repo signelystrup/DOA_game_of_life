@@ -52,6 +52,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void update(){
         //game logic here
+        //bunny.update();
     }
 
     @Override
