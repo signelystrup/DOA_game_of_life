@@ -4,15 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Spatial Hash Grid for efficient entity lookup
- *
- * Divides the world into a grid of cells. Each cell contains entities in that area.
- * This lets you find nearby entities without checking ALL entities in the world.
- *
- * IMPORTANT: findNearby() returns ALL entities from 9 cells (3x3 grid).
- * YOU must calculate actual distances to filter by vision range!
- *
- * Performance: Reduces checks from 1000 entities to ~50 entities (20x faster)
+ * Spatial Hash Grid for efficient entity lookup.
+ * Divides the world into cells for fast neighbor queries.
  */
 public class Grid {
     private final int cellSize;
@@ -23,9 +16,9 @@ public class Grid {
     /**
      * Create a spatial grid
      *
-     * @param worldWidth Width of game world in pixels (e.g., 500)
-     * @param worldHeight Height of game world in pixels (e.g., 500)
-     * @param cellSize Size of each cell in pixels (e.g., 50)
+     * @param worldWidth Width of game world in pixels
+     * @param worldHeight Height of game world in pixels
+     * @param cellSize Size of each cell in pixels
      */
     @SuppressWarnings("unchecked")
     public Grid(int worldWidth, int worldHeight, int cellSize) {
@@ -33,10 +26,8 @@ public class Grid {
         this.gridWidth = worldWidth / cellSize;
         this.gridHeight = worldHeight / cellSize;
 
-        // Create 2D array of ArrayLists
         cells = new ArrayList[gridWidth][gridHeight];
 
-        // Initialize each cell
         for (int x = 0; x < gridWidth; x++) {
             for (int y = 0; y < gridHeight; y++) {
                 cells[x][y] = new ArrayList<>();
@@ -45,11 +36,7 @@ public class Grid {
     }
 
     /**
-     * Insert entity into grid
-     *
-     * Example:
-     *   Bunny bunny = new Bunny(100, 150);
-     *   grid.insert(bunny, bunny.x, bunny.y);
+     * Insert entity into grid at given position
      */
     public void insert(Object entity, float worldX, float worldY) {
         int gridX = worldToGridX(worldX);
@@ -58,10 +45,7 @@ public class Grid {
     }
 
     /**
-     * Remove entity from grid
-     *
-     * Example:
-     *   grid.remove(bunny, bunny.x, bunny.y);
+     * Remove entity from grid at given position
      */
     public void remove(Object entity, float worldX, float worldY) {
         int gridX = worldToGridX(worldX);
@@ -70,26 +54,10 @@ public class Grid {
     }
 
     /**
-     * Find all entities in nearby cells (3x3 grid)
+     * Find all entities in nearby cells (3x3 grid around position)
+     * Note: Returns all entities from cells, not filtered by distance
      *
-     * Returns ALL entities from 9 cells - does NOT check distances!
-     * You must calculate distances yourself to filter by vision range.
-     *
-     * Example:
-     *   List<Object> nearby = grid.findNearby(rabbit.x, rabbit.y);
-     *   for (Object obj : nearby) {
-     *       if (obj instanceof Wolf) {
-     *           Wolf wolf = (Wolf)obj;
-     *           float dx = wolf.x - rabbit.x;
-     *           float dy = wolf.y - rabbit.y;
-     *           float distance = (float)Math.sqrt(dx*dx + dy*dy);
-     *           if (distance < 60) {
-     *               // Wolf is within vision!
-     *           }
-     *       }
-     *   }
-     *
-     * @return List of all entities from nearby cells (not filtered by distance)
+     * @return List of entities from nearby cells
      */
     public List<Object> findNearby(float worldX, float worldY) {
         List<Object> nearby = new ArrayList<>();
@@ -97,13 +65,11 @@ public class Grid {
         int centerX = worldToGridX(worldX);
         int centerY = worldToGridY(worldY);
 
-        // Check 3x3 grid (current cell + 8 neighbors)
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
                 int checkX = centerX + dx;
                 int checkY = centerY + dy;
 
-                // Stay within grid bounds
                 if (checkX >= 0 && checkX < gridWidth &&
                     checkY >= 0 && checkY < gridHeight) {
                     nearby.addAll(cells[checkX][checkY]);
@@ -126,17 +92,7 @@ public class Grid {
     }
 
     /**
-     * Check if a cell is empty at given world coordinates
-     * Useful for spawning grass at random empty spots
-     *
-     * Example:
-     *   Random random = new Random();
-     *   int x = random.nextInt(500);
-     *   int y = random.nextInt(500);
-     *   if (grid.isEmpty(x, y)) {
-     *       Grass grass = new Grass(x, y);
-     *       grid.insert(grass, x, y);
-     *   }
+     * Check if a cell is empty at given position
      */
     public boolean isEmpty(float worldX, float worldY) {
         int gridX = worldToGridX(worldX);
@@ -145,14 +101,7 @@ public class Grid {
     }
 
     /**
-     * Calculate distance between two points
-     * Static helper method - can be called without a Grid instance
-     *
-     * Example:
-     *   float dist = Grid.calculateDistance(rabbit.x, rabbit.y, wolf.x, wolf.y);
-     *   if (dist < 60) {
-     *       // Wolf is within vision!
-     *   }
+     * Calculate Euclidean distance between two points
      */
     public static float calculateDistance(float x1, float y1, float x2, float y2) {
         float dx = x2 - x1;
@@ -160,9 +109,6 @@ public class Grid {
         return (float)Math.sqrt(dx * dx + dy * dy);
     }
 
-    /**
-     * Convert world X coordinate to grid X coordinate
-     */
     private int worldToGridX(float worldX) {
         int gridX = (int)(worldX / cellSize);
         if (gridX < 0) gridX = 0;
@@ -170,9 +116,6 @@ public class Grid {
         return gridX;
     }
 
-    /**
-     * Convert world Y coordinate to grid Y coordinate
-     */
     private int worldToGridY(float worldY) {
         int gridY = (int)(worldY / cellSize);
         if (gridY < 0) gridY = 0;
@@ -180,7 +123,6 @@ public class Grid {
         return gridY;
     }
 
-    // Getters
     public int getCellSize() { return cellSize; }
     public int getGridWidth() { return gridWidth; }
     public int getGridHeight() { return gridHeight; }
