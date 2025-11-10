@@ -1,5 +1,8 @@
 package com.example.demo;
 
+import com.example.demo.entities.Bunny;
+import com.example.demo.entities.Wolf;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,6 +11,8 @@ public class GamePanel extends JPanel implements Runnable{
     private Thread gameThread;
     private final int FPS = 60;
 
+    private Bunny[] bunnies = new Bunny[10];
+    private Wolf wolf = new Wolf(350, 350);
 
     public GamePanel(){
         //screen settings
@@ -18,6 +23,12 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void setUpGame(){
         //init grid and entities here.
+
+        //bunnies:
+        for (int i = 0 ; i < 5 ; i ++){
+            bunnies[i] = new Bunny(32 * i, 32 * i);
+        }
+
     }
 
     public void startGameThread(){
@@ -60,10 +71,13 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
+        for (int i = 0; i < bunnies.length; i ++){
+            if (bunnies[i] != null) {
+                bunnies[i].draw(g2);
+            }
+        }
 
-        //bunny.draw(g2);
-        g2.setColor(Color.BLACK);
-        g2.fillRect(100,100,100,100);
+        wolf.draw(g2);
 
         g2.dispose(); //good practice, Saves memory. (program still works without this line)
 
