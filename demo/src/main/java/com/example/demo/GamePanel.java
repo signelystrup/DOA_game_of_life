@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.entities.Bunny;
+import com.example.demo.entities.Wolf;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +12,7 @@ public class GamePanel extends JPanel implements Runnable{
     private final int FPS = 60;
 
     private Bunny[] bunnies = new Bunny[10];
+    private Wolf wolf = new Wolf(350, 350);
 
     public GamePanel(){
         //screen settings
@@ -74,6 +76,8 @@ public class GamePanel extends JPanel implements Runnable{
                 bunnies[i].draw(g2);
             }
         }
+
+        wolf.draw(g2);
 
         g2.dispose(); //good practice, Saves memory. (program still works without this line)
 
