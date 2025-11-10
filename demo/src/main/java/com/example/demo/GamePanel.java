@@ -61,7 +61,8 @@ public class GamePanel extends JPanel implements Runnable{
 
 
         //bunny.draw(g2);
-
+        g2.setColor(Color.BLACK);
+        g2.fillRect(100,100,100,100);
 
         g2.dispose(); //good practice, Saves memory. (program still works without this line)
 
