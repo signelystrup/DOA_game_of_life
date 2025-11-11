@@ -8,6 +8,8 @@ public class GamePanel extends JPanel implements Runnable{
     private Thread gameThread;
     private final int FPS = 60;
 
+    private Grid grid;
+    private GrassManager grassManager;
 
     public GamePanel(){
         //screen settings
@@ -18,6 +20,8 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void setUpGame(){
         //init grid and entities here.
+        grid = new Grid(500, 500, 50);
+        grassManager = new GrassManager(grid);
     }
 
     public void startGameThread(){
@@ -52,6 +56,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void update(){
         //game logic here
+        //grassManager.update();
         //bunny.update();
     }
 
