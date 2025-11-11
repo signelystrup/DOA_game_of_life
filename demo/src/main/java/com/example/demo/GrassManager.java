@@ -17,9 +17,9 @@ public class GrassManager {
     private int proximityTimer = 0;
     private int randomTimer = 0;
 
-    private final int PROXIMITY_INTERVAL = 30;  // 0.5 seconds at 60 FPS
-    private final int RANDOM_INTERVAL = 60;     // 1.0 second at 60 FPS
-    private final int SPREAD_RADIUS = 25;       // Pixels
+    private final int PROXIMITY_INTERVAL = 120;  // 2.0 seconds at 60 FPS
+    private final int RANDOM_INTERVAL = 240;     // 4.0 seconds at 60 FPS
+    private final int SPREAD_RADIUS = 25;        // Pixels
 
     public GrassManager(Grid grid) {
         this.grid = grid;
@@ -93,6 +93,7 @@ public class GrassManager {
             if (grid.isEmpty(newX, newY)) {
                 Grass newGrass = new Grass(newX, newY);
                 grid.insert(newGrass, newX, newY);
+                //System.out.println("Grass spread near existing at (" + newX + ", " + newY + ")");
                 return;
             }
         }
@@ -112,6 +113,7 @@ public class GrassManager {
             if (grid.isEmpty(x, y)) {
                 Grass grass = new Grass(x, y);
                 grid.insert(grass, x, y);
+                //System.out.println("New grass patch spawned at (" + x + ", " + y + ")");
                 return;
             }
         }

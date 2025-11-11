@@ -1,10 +1,12 @@
 package com.example.demo;
 
 import com.example.demo.entities.Bunny;
+import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class GamePanel extends JPanel implements Runnable{
 
@@ -31,7 +33,11 @@ public class GamePanel extends JPanel implements Runnable{
         //bunnies:
         for (int i = 0 ; i < 5 ; i ++){
             bunnies[i] = new Bunny(32 * i, 32 * i);
+            grid.insert(bunnies[i], bunnies[i].x, bunnies[i].y);
         }
+
+        //wolf:
+        grid.insert(wolf, wolf.x, wolf.y);
     }
 
     public void startGameThread(){
@@ -66,7 +72,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void update(){
         //game logic here
-        //grassManager.update();
+        grassManager.update();
         //bunny.update();
     }
 
@@ -75,13 +81,27 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
-        for (int i = 0; i < bunnies.length; i ++){
-            if (bunnies[i] != null) {
-                bunnies[i].draw(g2);
+        // Draw all entities from grid
+        List<Object> allEntities = grid.getAllEntities();
+
+        for (Object obj : allEntities) {
+            if (obj instanceof Grass) {
+                ((Grass)obj).draw(g2);
+            } else if (obj instanceof Bunny) {
+                ((Bunny)obj).draw(g2);
+            } else if (obj instanceof Wolf) {
+                ((Wolf)obj).draw(g2);
             }
         }
 
-        wolf.draw(g2);
+        // Old drawing code (commented out)
+        //for (int i = 0; i < bunnies.length; i ++){
+        //    if (bunnies[i] != null) {
+        //        bunnies[i].draw(g2);
+        //    }
+        //}
+        //
+        //wolf.draw(g2);
 
         g2.dispose(); //good practice, Saves memory. (program still works without this line)
 
