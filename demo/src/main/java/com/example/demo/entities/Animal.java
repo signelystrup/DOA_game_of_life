@@ -1,8 +1,13 @@
 package com.example.demo.entities;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 public class Animal {
     protected int x, y;
     protected int gridX, gridY;
+    protected double dx, dy;
+    protected int SPEED = 6;
 
     public Animal(int x, int y){
         this.x = x;
@@ -10,4 +15,9 @@ public class Animal {
         gridX = 0; //TODO: calculate.
         gridY = 0;
     }
+
+    public void draw(Graphics2D g2){}
+
+    public void update(){}
+
 }
