@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.entities.Bunny;
+import com.example.demo.entities.Fence;
 import com.example.demo.entities.Wolf;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     private Bunny[] bunnies = new Bunny[10];
     private Wolf wolf = new Wolf(350, 350);
+    private Fence[] fences = new Fence[10];
 
     public GamePanel(){
         //screen settings
@@ -23,6 +25,9 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void setUpGame(){
         //init grid and entities here.
+
+        fences[0] = new Fence(100, 0, 100, 100);
+        fences[1] = new Fence(100,100, 160,180);
 
         //bunnies:
         for (int i = 0 ; i < 5 ; i ++){
@@ -71,6 +76,14 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
+        //fences
+        for(int i = 0; i < fences.length; i ++){
+            if (fences[i] != null){
+                fences[i].draw(g2);
+            }
+        }
+
+        //bunnies
         for (int i = 0; i < bunnies.length; i ++){
             if (bunnies[i] != null) {
                 bunnies[i].draw(g2);
