@@ -1,34 +1,63 @@
 package com.example.demo;
 
 import com.example.demo.entities.Bunny;
+import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GamePanel extends JPanel implements Runnable{
 
     private Thread gameThread;
     private final int FPS = 60;
+    
+    // World size
+    private final int WORLD_WIDTH = 500;
+    private final int WORLD_HEIGHT = 500;
+    private final int CELL_SIZE = 50;  // Grid cell size
 
-    private Bunny[] bunnies = new Bunny[10];
-    private Wolf wolf = new Wolf(350, 350);
+    // Grid for spatial partitioning
+    private Grid grid;
+    
+    // Entities
+    private List<Bunny> bunnies = new ArrayList<>();
+    private List<Wolf> wolves = new ArrayList<>();
+    private List<Grass> grassList = new ArrayList<>();
 
     public GamePanel(){
         //screen settings
-        this.setPreferredSize(new Dimension(500, 500));
+        this.setPreferredSize(new Dimension(WORLD_WIDTH, WORLD_HEIGHT));
         this.setBackground(Color.PINK);
-        this.setDoubleBuffered(true); //improve rending performance.
+        this.setDoubleBuffered(true); //improve rendering performance.
     }
 
     public void setUpGame(){
-        //init grid and entities here.
-
-        //bunnies:
-        for (int i = 0 ; i < 5 ; i ++){
-            bunnies[i] = new Bunny(32 * i, 32 * i);
+        // Initialize grid
+        grid = new Grid(WORLD_WIDTH, WORLD_HEIGHT, CELL_SIZE);
+        
+        // Create bunnies
+        for (int i = 0; i < 10; i++){
+            int x = (int)(Math.random() * WORLD_WIDTH);
+            int y = (int)(Math.random() * WORLD_HEIGHT);
+            bunnies.add(new Bunny(x, y));
         }
-
+        
+        // Create wolves
+        for (int i = 0; i < 3; i++){
+            int x = (int)(Math.random() * WORLD_WIDTH);
+            int y = (int)(Math.random() * WORLD_HEIGHT);
+            wolves.add(new Wolf(x, y));
+        }
+        
+        // Create grass patches
+        for (int i = 0; i < 20; i++){
+            int x = (int)(Math.random() * WORLD_WIDTH);
+            int y = (int)(Math.random() * WORLD_HEIGHT);
+            grassList.add(new Grass(x, y));
+        }
     }
 
     public void startGameThread(){
@@ -39,7 +68,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     @Override
     public void run(){
-        double drawInterval = 1000000000 / FPS; //1/60 second.
+        double drawInterval = 1000000000.0 / FPS; //1/60 second.
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
@@ -62,8 +91,31 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void update(){
-        //game logic here
-        //bunny.update();
+        // Clear and rebuild grid each frame
+        grid.clear();
+        
+        // Insert all entities into grid
+        for (Bunny bunny : bunnies) {
+            grid.insert(bunny, bunny.getX(), bunny.getY());
+        }
+        for (Wolf wolf : wolves) {
+            grid.insert(wolf, wolf.getX(), wolf.getY());
+        }
+        for (Grass grass : grassList) {
+            grid.insert(grass, grass.getX(), grass.getY());
+        }
+        
+        // Update all bunnies with flocking
+        for (Bunny bunny : bunnies) {
+            bunny.update(grid);
+        }
+        
+        // Update all wolves with flocking
+        for (Wolf wolf : wolves) {
+            wolf.update(grid);
+        }
+        
+        // TODO: Check for eating grass, collisions, etc.
     }
 
     @Override
@@ -71,16 +123,21 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
-        for (int i = 0; i < bunnies.length; i ++){
-            if (bunnies[i] != null) {
-                bunnies[i].draw(g2);
-            }
+        // Draw grass first (background layer)
+        for (Grass grass : grassList) {
+            grass.draw(g2);
+        }
+        
+        // Draw bunnies
+        for (Bunny bunny : bunnies) {
+            bunny.draw(g2);
+        }
+        
+        // Draw wolves
+        for (Wolf wolf : wolves) {
+            wolf.draw(g2);
         }
 
-        wolf.draw(g2);
-
-        g2.dispose(); //good practice, Saves memory. (program still works without this line)
-
+        g2.dispose(); //good practice, Saves memory.
     }
-
 }
