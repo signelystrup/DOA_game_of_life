@@ -7,6 +7,7 @@ import com.example.demo.entities.Wolf;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable{
 
@@ -16,27 +17,34 @@ public class GamePanel extends JPanel implements Runnable{
     private Grid grid;
     private GrassManager grassManager;
     private Bunny[] bunnies = new Bunny[10];
-    private Wolf wolf = new Wolf(350, 350);
+    private Wolf wolf;
+    private Random random = new Random();
 
     public GamePanel(){
         //screen settings
-        this.setPreferredSize(new Dimension(500, 500));
+        this.setPreferredSize(new Dimension(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT));
         this.setBackground(Color.PINK);
         this.setDoubleBuffered(true); //improve rending performance.
     }
 
     public void setUpGame(){
         //init grid and entities here.
-        grid = new Grid(500, 500, 50);
+        // Cell size = max(vision ranges) to ensure findNearby() works for all species
+        grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.GRID_CELL_SIZE);
         grassManager = new GrassManager(grid);
 
-        //bunnies:
+        //bunnies: random placement
         for (int i = 0 ; i < 5 ; i ++){
-            bunnies[i] = new Bunny(32 * i, 32 * i);
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+            bunnies[i] = new Bunny(randomX, randomY);
             grid.insert(bunnies[i], bunnies[i].x, bunnies[i].y);
         }
 
-        //wolf:
+        //wolf: random placement
+        int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+        int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+        wolf = new Wolf(randomX, randomY);
         grid.insert(wolf, wolf.x, wolf.y);
     }
 
