@@ -26,8 +26,8 @@ public class GamePanel extends JPanel implements Runnable{
     public void setUpGame(){
         //init grid and entities here.
 
-        fences[0] = new Fence(100, 0, 100, 100);
-        fences[1] = new Fence(100,100, 160,180);
+        fences[0] = new Fence(3);
+        fences[1] = new Fence(10);
 
         //bunnies:
         for (int i = 0 ; i < 5 ; i ++){
