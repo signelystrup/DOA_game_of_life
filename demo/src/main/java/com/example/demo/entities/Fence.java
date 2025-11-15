@@ -20,61 +20,76 @@ public class Fence {
             this.startY = startY;
 
             boolean horizontal = false;
+            Random r = new Random();
+            int direction = (r.nextInt(0,2) - 1);
+            int dx = 24;
+            int dy = 24;
 
             try{
-                a = (prevX -startX)/(prevY - startY); //calculate slope of prev segment.
+                a = (prevX - startX)/(prevY - startY); //calculate slope of prev segment.
+                if (prevX - startX > 0){
+                    dx = -dx;
+                }
+                if (prevY - startY > 0){
+                    dy = -dy;
+                }
+
             }catch (ArithmeticException e){
                 //divide by 0 (horizontally oriented)(?)
                 horizontal = true;
             }
 
-            Random r = new Random();
-            int direction = (r.nextInt(0,2) - 1);
-            int distance = 24;
-            endY = startY + distance;
-            endX = startX + distance;
+            calculateEndPoint(dx, dy, direction);
+
+            //System.out.println("\nx1: " + this.startX + ", y1: " + this.startY + "\nx2: " + endX + ", y2: " + endY);
+        }
+
+        public void calculateEndPoint(int dx, int dy, int direction){
+            endY = startY + dy;
+            endX = startX + dx;
 
             System.out.println("a: " + a);
-            System.out.println("\ndirection: " + direction);
+            System.out.println("\ndirection: " + direction + "\ndx, dy: " + dx + ", " + dy);
 
             switch(a){
                 case -1:
-                    if (direction == 1){
+                    if (direction == -1){ //counter-clockwise --> horizontal.
                         endY = startY;
-                    }else if (direction == -1){
+                    }else if (direction == 1){ //clockwise --> vertical.
                         endX = startX;
                     }
                     break;
-                case 0: //horizontal
-                    endY = startY + distance * direction;
+                case 0: //vertical
+                    endX = startX + dx * direction; //only x can change.
                     break;
                 case 1:
-                    if (direction == -1){
-                        endY = startY;
-                    }else if (direction == 1){
+                    if (direction == -1){ //counter-clockwise
                         endX = startX;
+                    }else if (direction == 1){ //clockwise
+                        endY = startY;
                     }
                     break;
-                default: //vertical
-                    endX = startX + distance * direction;
-                break;
+                default: //horizontal
+                    endY = startY + dy * direction; //only y can change.
+
+                    break;
             }
 
-            //endX = startX + distance * (a == 2 ? a + direction : a);
-            //endY = startY + distance * (a + r.nextInt(-1,1));
-            //endX = horizontal ? startX + distance : start * (a + r.nextInt(2) - 1);
-            //endY = startY + distance * (a + r.nextInt(2) - 1);
+            //endX = startX + dx * (a == 2 ? a + direction : a);
+            //endY = startY + dx * (a + r.nextInt(-1,1));
+            //endX = horizontal ? startX + dx : start * (a + r.nextInt(2) - 1);
+            //endY = startY + dx * (a + r.nextInt(2) - 1);
 
             //boo.
             /*
             switch (a){
                 case 1:
                     if (direction == 0 || direction == 1){
-                        endX = startX + distance;
+                        endX = startX + dx;
                     }
 
                     if (direction == -1 || direction == 0){
-                        endY = startY + distance;
+                        endY = startY + dx;
                     }
 
                     break;
@@ -85,7 +100,7 @@ public class Fence {
                         endX = st
                     }
 
-                    endY = startY + distance;
+                    endY = startY + dx;
 
                     break;
                 case -1:
@@ -93,9 +108,32 @@ public class Fence {
                 default:
                     break;
             }*/
+        }
+
+        private void calculateEndX(){
+            //f(x) = ax + b
+            //ax + b
 
 
-            //System.out.println("\nx1: " + this.startX + ", y1: " + this.startY + "\nx2: " + endX + ", y2: " + endY);
+            //1/8 directions. --> 1/3 directions.
+            // +/- x
+            // +/- y.
+
+            // x1 > x2
+            // y1 > y2.
+
+        }
+
+        private int calculateEndY(int y1, int y2, int distance){
+            Random r = new Random();
+            int multiplier = r.nextInt(0,2) - 1;
+            if (y1 == y2){
+                return y2 + distance * multiplier;
+            }else if (y1 - y2 < 0){ //heading down
+                return y2 + distance;
+            }else{
+                return y2 - distance;
+            }
         }
 
 
