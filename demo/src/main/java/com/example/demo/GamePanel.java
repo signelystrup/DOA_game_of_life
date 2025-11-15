@@ -70,11 +70,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void update(){
         //game logic here
-        for (int i = 0; i < bunnies.length; i ++){
-            if (bunnies[i] != null) {
-                bunnies[i].update();
-            }
-        }
+        //bunny.update();
     }
 
     @Override

@@ -15,7 +15,7 @@ public class Animal {
     }
 
     public void draw(Graphics2D g2){}
-    public void move(){}
+
     public void update(){}
 
 }
