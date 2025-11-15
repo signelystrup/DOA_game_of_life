@@ -29,12 +29,36 @@ public class Fence {
             }
 
             Random r = new Random();
-            int direction = r.nextInt();
-
-           // int newDirection = a + direction;
+            int direction = (r.nextInt(0,2) - 1);
             int distance = 24;
+            endY = startY + distance;
+            endX = startX + distance;
 
-            
+            System.out.println("a: " + a);
+            System.out.println("\ndirection: " + direction);
+
+            switch(a){
+                case -1:
+                    if (direction == 1){
+                        endY = startY;
+                    }else if (direction == -1){
+                        endX = startX;
+                    }
+                    break;
+                case 0: //horizontal
+                    endY = startY + distance * direction;
+                    break;
+                case 1:
+                    if (direction == -1){
+                        endY = startY;
+                    }else if (direction == 1){
+                        endX = startX;
+                    }
+                    break;
+                default: //vertical
+                    endX = startX + distance * direction;
+                break;
+            }
 
             //endX = startX + distance * (a == 2 ? a + direction : a);
             //endY = startY + distance * (a + r.nextInt(-1,1));
@@ -70,7 +94,6 @@ public class Fence {
                     break;
             }*/
 
-            System.out.println("a: " + a);
 
             //System.out.println("\nx1: " + this.startX + ", y1: " + this.startY + "\nx2: " + endX + ", y2: " + endY);
         }
@@ -104,7 +127,11 @@ public class Fence {
 
         for (int i = 0; i < fence.length; i ++) {
             g2.drawLine(fence[i].getStartX(), fence[i].getStartY(), fence[i].getEndX(), fence[i].getEndY());
-        }
-        //g2.drawImage(sprite, x, y, 24, 24, null);
+            if (i % 2 == 0) {
+                g2.setColor(Color.RED);
+            } else {
+                g2.setColor(Color.BLACK);
+            }
+        }//g2.drawImage(sprite, x, y, 24, 24, null);
     }
 }
