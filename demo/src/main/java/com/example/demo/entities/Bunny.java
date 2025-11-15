@@ -8,9 +8,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
 
+import static java.lang.Math.sqrt;
+
 @Getter
 public class Bunny extends Animal {
-    static final int SPEED = 5;
+    static final int SPEED = 3;
     static BufferedImage sprite;
 
     public Bunny(int worldX, int worldY){
@@ -39,23 +41,26 @@ public class Bunny extends Animal {
     @Override
     public void move(){
         try {
-            int slope = (destX - worldX) / (destY - worldY);
-
-            int steps = slope / SPEED;
-            //System.out.println("distance: " + distance);
-            //int steps = distance / SPEED;
-            int dx = (destX - worldX) / 20;
-            int dy = (destY - worldY) /20;
+            int dx = (destX - worldX);
+            int dy = (destY - worldY);
+            int slope = (dx) / (dy);
 
 
+            int distance =(int) sqrt(dx*dx + dy*dy);
 
-            worldX += dx;
-            worldY += dy;
+
+            int step = distance / SPEED;
+
+
+            //int intervalX = dx/SPEED;
+
+            worldX += dx / step;
+            worldY += dy / step;
 
 
         }catch(ArithmeticException e){ //can't divide by 0.
             worldX ++;
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
