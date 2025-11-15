@@ -27,6 +27,8 @@ public class Bunny extends Animal {
 
     }
 
+
+
     public void loadSprite(){
         if (sprite == null) {
             try {

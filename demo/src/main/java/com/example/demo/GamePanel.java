@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.example.demo.entities.Bunny;
 import com.example.demo.entities.Fence;
+import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
 
 import javax.swing.*;
@@ -15,6 +16,7 @@ public class GamePanel extends JPanel implements Runnable{
     private Bunny[] bunnies = new Bunny[10];
     private Wolf wolf = new Wolf(350, 350);
     private Fence[] fences = new Fence[10];
+    private Grass grass = new Grass(170,170);
 
     public GamePanel(){
         //screen settings
@@ -83,6 +85,9 @@ public class GamePanel extends JPanel implements Runnable{
             }
         }
 
+        //grass
+        grass.draw(g2);
+
         //bunnies
         for (int i = 0; i < bunnies.length; i ++){
             if (bunnies[i] != null) {
@@ -90,10 +95,10 @@ public class GamePanel extends JPanel implements Runnable{
             }
         }
 
+        //wolves
         wolf.draw(g2);
 
-        g2.dispose(); //good practice, Saves memory. (program still works without this line)
-
+        g2.dispose(); //Saves memory. (program still works without this line)
     }
 
 }
