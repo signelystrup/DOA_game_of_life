@@ -15,39 +15,36 @@ public class Fence {
         private int startX, startY, endX, endY;
         private int a = 2;
 
-        public Segment(int startX, int startY, int prevX, int prevY){
+        public Segment(int startX, int startY, int prevX, int prevY) {
             this.startX = startX;
             this.startY = startY;
 
             int dx = 24;
             int dy = 24;
 
-            if (prevX - startX > 0){
+            if (prevX - startX > 0) {
                 dx *= -1;
             }
-            if (prevY - startY > 0){
+            if (prevY - startY > 0) {
                 dy *= -1;
             }
 
+            //set default values for end point.
             endY = startY + dy;
             endX = startX + dx;
 
+            //get random direction (turn clockwise, continue straight ahead, turn counter-clockwise
             Random r = new Random();
-            int direction = (r.nextInt(0,2) - 1);
+            int direction = (r.nextInt(0, 2) - 1);
 
-            try{
-                a = (prevX - startX)/(prevY - startY); //calculate slope of prev segment.
+            try {
+                a = (prevX - startX) / (prevY - startY); //calculate slope (a) of prev segment.
 
                 calculateEndPoint(dx, direction);
 
-            }catch (ArithmeticException e){//divide by 0
+            } catch (ArithmeticException e) {//divide by 0. If line is horizontal.
                 endY = startY + dy * direction; //only y can change.
             }
-
-            System.out.println("a: " + a);
-            System.out.println("\ndirection: " + direction + "\ndx, dy: " + dx + ", " + dy);
-
-            //System.out.println("\nx1: " + this.startX + ", y1: " + this.startY + "\nx2: " + endX + ", y2: " + endY);
         }
 
         public void calculateEndPoint(int dx, int direction){
@@ -64,85 +61,19 @@ public class Fence {
                     endX = startX + dx * direction; //only x can change.
                     break;
                 case 1:
-                    if (direction == -1){ //counter-clockwise
+                    if (direction == -1){ //counter-clockwise --> vertical
                         endX = startX;
-                    }else if (direction == 1){ //clockwise
+                    }else if (direction == 1){ //clockwise --> horizontal.
                         endY = startY;
                     }
                     break;
                 default:
                     break;
-            }
-
-            System.out.println("(" + endX + ", " + endY + ")");
-
-            //endX = startX + dx * (a == 2 ? a + direction : a);
-            //endY = startY + dx * (a + r.nextInt(-1,1));
-            //endX = horizontal ? startX + dx : start * (a + r.nextInt(2) - 1);
-            //endY = startY + dx * (a + r.nextInt(2) - 1);
-
-            //boo.
-            /*
-            switch (a){
-                case 1:
-                    if (direction == 0 || direction == 1){
-                        endX = startX + dx;
-                    }
-
-                    if (direction == -1 || direction == 0){
-                        endY = startY + dx;
-                    }
-
-                    break;
-
-                case 0:
-
-                    if (direction == -1 ){
-                        endX = st
-                    }
-
-                    endY = startY + dx;
-
-                    break;
-                case -1:
-                    break;
-                default:
-                    break;
-            }*/
+            }//eo switch.
         }
-
-        private void calculateEndX(){
-            //f(x) = ax + b
-            //ax + b
-
-
-            //1/8 directions. --> 1/3 directions.
-            // +/- x
-            // +/- y.
-
-            // x1 > x2
-            // y1 > y2.
-
-        }
-
-        private int calculateEndY(int y1, int y2, int distance){
-            Random r = new Random();
-            int multiplier = r.nextInt(0,2) - 1;
-            if (y1 == y2){
-                return y2 + distance * multiplier;
-            }else if (y1 - y2 < 0){ //heading down
-                return y2 + distance;
-            }else{
-                return y2 - distance;
-            }
-        }
-
 
     }
 
-
-
-    private String orientation; //"horizontal", "vertical", "s_diagonal", "z_diagonal" (?)
     public Fence (int length){
         fence = new Segment[length];
 
