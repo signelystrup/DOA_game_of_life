@@ -19,37 +19,38 @@ public class Fence {
             this.startX = startX;
             this.startY = startY;
 
-            boolean horizontal = false;
-            Random r = new Random();
-            int direction = (r.nextInt(0,2) - 1);
             int dx = 24;
             int dy = 24;
 
-            try{
-                a = (prevX - startX)/(prevY - startY); //calculate slope of prev segment.
-                if (prevX - startX > 0){
-                    dx = -dx;
-                }
-                if (prevY - startY > 0){
-                    dy = -dy;
-                }
-
-            }catch (ArithmeticException e){
-                //divide by 0 (horizontally oriented)(?)
-                horizontal = true;
+            if (prevX - startX > 0){
+                dx *= -1;
+            }
+            if (prevY - startY > 0){
+                dy *= -1;
             }
 
-            calculateEndPoint(dx, dy, direction);
+            endY = startY + dy;
+            endX = startX + dx;
+
+            Random r = new Random();
+            int direction = (r.nextInt(0,2) - 1);
+
+            try{
+                a = (prevX - startX)/(prevY - startY); //calculate slope of prev segment.
+
+                calculateEndPoint(dx, direction);
+
+            }catch (ArithmeticException e){//divide by 0
+                endY = startY + dy * direction; //only y can change.
+            }
+
+            System.out.println("a: " + a);
+            System.out.println("\ndirection: " + direction + "\ndx, dy: " + dx + ", " + dy);
 
             //System.out.println("\nx1: " + this.startX + ", y1: " + this.startY + "\nx2: " + endX + ", y2: " + endY);
         }
 
-        public void calculateEndPoint(int dx, int dy, int direction){
-            endY = startY + dy;
-            endX = startX + dx;
-
-            System.out.println("a: " + a);
-            System.out.println("\ndirection: " + direction + "\ndx, dy: " + dx + ", " + dy);
+        public void calculateEndPoint(int dx, int direction){
 
             switch(a){
                 case -1:
@@ -69,11 +70,11 @@ public class Fence {
                         endY = startY;
                     }
                     break;
-                default: //horizontal
-                    endY = startY + dy * direction; //only y can change.
-
+                default:
                     break;
             }
+
+            System.out.println("(" + endX + ", " + endY + ")");
 
             //endX = startX + dx * (a == 2 ? a + direction : a);
             //endY = startY + dx * (a + r.nextInt(-1,1));
@@ -145,10 +146,11 @@ public class Fence {
     public Fence (int length){
         fence = new Segment[length];
 
-        int startX = 100;
-        int startY = 124;
-        int prevX = 124;
-        int prevY = 100;
+        Random r = new Random();
+        int startX = r.nextInt(0,500);
+        int startY = r.nextInt(0,500);
+        int prevX = startX - 10;
+        int prevY = startY  - 10;
 
         for (int i = 0; i < length; i ++){
             fence[i] = new Segment(startX, startY, prevX, prevY);
