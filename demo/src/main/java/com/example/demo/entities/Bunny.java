@@ -6,21 +6,20 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Random;
 
 @Getter
 public class Bunny extends Animal {
     static final int SPEED = 5;
     static BufferedImage sprite;
 
-    public Bunny(int x, int y){
-        super(x, y);
+    public Bunny(int worldX, int worldY){
+        super(worldX, worldY);
         loadSprite();
     }
 
     @Override
     public void draw(Graphics2D g2){
-        g2.drawImage(sprite, x, y, 24, 24, null);
+        g2.drawImage(sprite, worldX, worldY, 24, 24, null);
     }
 
     @Override

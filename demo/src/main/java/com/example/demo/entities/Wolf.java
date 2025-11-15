@@ -9,14 +9,14 @@ public class  Wolf extends Animal {
     static final int SPEED = 6;
     static BufferedImage sprite;
 
-    public Wolf(int x, int y){
-        super(x, y);
+    public Wolf(int worldX, int worldY){
+        super(worldX, worldY);
         loadSprite();
     }
 
     @Override
     public void draw(Graphics2D g2){
-        g2.drawImage(sprite, x, y, 24, 24, null);
+        g2.drawImage(sprite, worldX, worldY, 24, 24, null);
     }
 
     @Override
