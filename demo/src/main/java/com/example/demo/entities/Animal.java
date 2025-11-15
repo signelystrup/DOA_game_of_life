@@ -6,7 +6,6 @@ import static java.lang.Math.sqrt;
 
 public class Animal {
     protected int worldX, worldY;
-    protected double dx, dy;
     protected int SPEED = 6;
 
     protected int destX, destY;
@@ -17,6 +16,7 @@ public class Animal {
     }
 
     public void draw(Graphics2D g2){}
+
     public void move(){
         try {
             int dx = (destX - worldX);
@@ -33,6 +33,7 @@ public class Animal {
             //e.printStackTrace();
         }
     }
+
     public void update(){}
 
 }

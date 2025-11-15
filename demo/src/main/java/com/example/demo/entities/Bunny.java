@@ -17,7 +17,6 @@ public class Bunny extends Animal {
 
     public Bunny(int worldX, int worldY){
         super(worldX, worldY);
-
         findDest();
 
         loadSprite();
