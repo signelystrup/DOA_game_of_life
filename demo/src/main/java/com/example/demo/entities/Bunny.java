@@ -16,8 +16,7 @@ public class Bunny extends Animal {
     public Bunny(int worldX, int worldY){
         super(worldX, worldY);
 
-        destX = 300;
-        destY = 300;
+        findDest();
 
         loadSprite();
     }
@@ -29,24 +28,44 @@ public class Bunny extends Animal {
 
     @Override
     public void update(){
+        if (worldX == destX && worldY == destY){
+            System.out.println(":))");
+            findDest();
+        }
+
         move();
     }
 
     @Override
     public void move(){
         try {
-            int a = (destX - worldX) / (destY - worldY);
-            worldX += a * SPEED;
-            worldY += a * SPEED;
-        }catch(ArithmeticException e){
-            findPath();
+            int slope = (destX - worldX) / (destY - worldY);
+
+            int steps = slope / SPEED;
+            //System.out.println("distance: " + distance);
+            //int steps = distance / SPEED;
+            int dx = (destX - worldX) / 20;
+            int dy = (destY - worldY) /20;
+
+
+
+            worldX += dx;
+            worldY += dy;
+
+
+        }catch(ArithmeticException e){ //can't divide by 0.
+            worldX ++;
+            e.printStackTrace();
         }
     }
 
-    public void findPath(){
+    public void findDest(){
+        //rewrite with find path:
         Random r = new Random();
         destX = r.nextInt(0,500);
-        destX = r.nextInt(0,500);
+        destY = r.nextInt(0,500);
+
+        System.out.println("dest: (" + destX + ", " + destY + ")");
     }
 
     public void loadSprite(){
