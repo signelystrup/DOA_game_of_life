@@ -7,6 +7,7 @@ import com.example.demo.entities.Wolf;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable{
 
@@ -15,29 +16,48 @@ public class GamePanel extends JPanel implements Runnable{
 
     private Grid grid;
     private GrassManager grassManager;
-    private Bunny[] bunnies = new Bunny[10];
-    private Wolf wolf = new Wolf(350, 350);
+    private Bunny[] bunnies;
+    private Wolf[] wolves;
+    private Random random = new Random();
 
     public GamePanel(){
         //screen settings
-        this.setPreferredSize(new Dimension(500, 500));
+        this.setPreferredSize(new Dimension(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT));
         this.setBackground(Color.PINK);
         this.setDoubleBuffered(true); //improve rending performance.
     }
 
-    public void setUpGame(){
+    public void setUpGame(int bunnyCount, int wolfCount, int grassCount){
         //init grid and entities here.
-        grid = new Grid(500, 500, 50);
+        // Cell size = max(vision ranges) to ensure findNearby() works for all species
+        grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.GRID_CELL_SIZE);
         grassManager = new GrassManager(grid);
 
-        //bunnies:
-        for (int i = 0 ; i < 5 ; i ++){
-            bunnies[i] = new Bunny(32 * i, 32 * i);
+        //bunnies: random placement
+        bunnies = new Bunny[bunnyCount];
+        for (int i = 0 ; i < bunnyCount ; i ++){
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+            bunnies[i] = new Bunny(randomX, randomY);
             grid.insert(bunnies[i], bunnies[i].x, bunnies[i].y);
         }
 
-        //wolf:
-        grid.insert(wolf, wolf.x, wolf.y);
+        //wolves: random placement
+        wolves = new Wolf[wolfCount];
+        for (int i = 0 ; i < wolfCount ; i ++){
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+            wolves[i] = new Wolf(randomX, randomY);
+            grid.insert(wolves[i], wolves[i].x, wolves[i].y);
+        }
+
+        //grass: random placement
+        for (int i = 0 ; i < grassCount ; i ++){
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+            Grass grass = new Grass(randomX, randomY);
+            grid.insert(grass, randomX, randomY);
+        }
     }
 
     public void startGameThread(){
