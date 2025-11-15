@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Random;
 
 public class  Wolf extends Animal {
     static final int SPEED = 6;
@@ -21,7 +22,23 @@ public class  Wolf extends Animal {
 
     @Override
     public void update(){
+        if (worldX == destX && worldY == destY){
+            findDest();
+        }
 
+        move();
+    }
+
+    @Override
+    public void move(){
+        super.move();
+    }
+
+    public void findDest(){
+        //rewrite with find path:
+        Random r = new Random();
+        destX = r.nextInt(0,500);
+        destY = r.nextInt(0,500);
     }
 
     public void loadSprite(){
