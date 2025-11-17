@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.entities.Bunny;
+import com.example.demo.entities.Fence;
 import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
 
@@ -26,6 +27,7 @@ public class GamePanel extends JPanel implements Runnable{
     private List<Bunny> bunnies = new ArrayList<>();
     private List<Wolf> wolves = new ArrayList<>();
     private List<Grass> grassList = new ArrayList<>();
+    private List<Fence> fences = new ArrayList<>();
 
     public GamePanel(){
         //screen settings
@@ -57,6 +59,11 @@ public class GamePanel extends JPanel implements Runnable{
             int x = (int)(Math.random() * WORLD_WIDTH);
             int y = (int)(Math.random() * WORLD_HEIGHT);
             grassList.add(new Grass(x, y));
+        }
+        
+        // Create fences
+        for (int i = 0; i < 3; i++){
+            fences.add(new Fence(10)); // 10 segments per fence
         }
     }
 
@@ -126,6 +133,11 @@ public class GamePanel extends JPanel implements Runnable{
         // Draw grass first (background layer)
         for (Grass grass : grassList) {
             grass.draw(g2);
+        }
+        
+        // Draw fences
+        for (Fence fence : fences) {
+            fence.draw(g2);
         }
         
         // Draw bunnies

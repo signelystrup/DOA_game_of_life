@@ -10,7 +10,7 @@ public class Vector2d {
     
     public void add(Vector2d v) { 
         x += v.x; 
-        y += v.y; 
+        y += v.y;
     }
     
     public void sub(Vector2d v) { 
