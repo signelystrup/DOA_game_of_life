@@ -94,15 +94,15 @@ public class GamePanel extends JPanel implements Runnable{
         // Clear and rebuild grid each frame
         grid.clear();
         
-        // Insert all entities into grid
+        // Insert all entities into grid using worldX and worldY
         for (Bunny bunny : bunnies) {
-            grid.insert(bunny, bunny.getX(), bunny.getY());
+            grid.insert(bunny, bunny.getWorldX(), bunny.getWorldY());
         }
         for (Wolf wolf : wolves) {
-            grid.insert(wolf, wolf.getX(), wolf.getY());
+            grid.insert(wolf, wolf.getWorldX(), wolf.getWorldY());
         }
         for (Grass grass : grassList) {
-            grid.insert(grass, grass.getX(), grass.getY());
+            grid.insert(grass, grass.getWorldX(), grass.getWorldY());
         }
         
         // Update all bunnies with flocking
