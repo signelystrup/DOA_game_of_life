@@ -45,7 +45,7 @@ public class Wolf extends Animal {
     // Seek: hunt the closest bunny
     private Vector2d seekBunny(List<Bunny> bunnies) {
         // Find closest bunny
-        Bunny closest = null;
+        Bunny nearestBunny = null;
         double minDist = Double.MAX_VALUE;
 
         for (Bunny bunny : bunnies) {
@@ -55,18 +55,18 @@ public class Wolf extends Animal {
 
             if (dist < minDist) {
                 minDist = dist;
-                closest = bunny;
+                nearestBunny = bunny;
             }
         }
 
-        if (closest == null) return new Vector2d(0, 0);
+        if (nearestBunny == null) return new Vector2d(0, 0);
 
-        Vector2d desired = new Vector2d(closest.getWorldX() - worldX, closest.getWorldY() - worldY);
+        Vector2d desired = new Vector2d(nearestBunny.getWorldX() - worldX, nearestBunny.getWorldY() - worldY);
         desired.normalize();
         desired.mult(speed);
 
         Vector2d steer = desired.copy();
-        steer.sub(velocity);
+        steer.sub(currMovement);
 
         return steer;
     }

@@ -71,7 +71,7 @@ public class Bunny extends Animal {
         for (Wolf wolf : wolves) {
             double dx = worldX - wolf.getWorldX();
             double dy = worldY - wolf.getWorldY();
-            double dist = Math.sqrt(dx * dx + dy * dy);
+            double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
 
             if (dist > 0 && dist < visionRadius) {
                 Vector2d away = new Vector2d(dx, dy);
@@ -84,7 +84,7 @@ public class Bunny extends Animal {
         if (fleeDir.magnitude() > 0) {
             fleeDir.normalize();
             fleeDir.mult(speed);
-            fleeDir.sub(velocity);
+            fleeDir.sub(currMovement); //subtract
         }
 
         return fleeDir;
@@ -93,28 +93,28 @@ public class Bunny extends Animal {
     // Seek: move TOWARD grass
     private Vector2d seekGrass(List<Grass> grassList) {
         // Find closest grass
-        Grass closest = null;
-        double minDist = Double.MAX_VALUE;
+        Grass nearestGrass = null;
+        double minDist = Double.MAX_VALUE; //highest possible double value. for finding smaller values.
 
         for (Grass grass : grassList) {
             double dx = worldX - grass.getWorldX();
             double dy = worldY - grass.getWorldY();
-            double dist = Math.sqrt(dx * dx + dy * dy);
+            double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
 
             if (dist < minDist) {
                 minDist = dist;
-                closest = grass;
+                nearestGrass = grass;
             }
-        }
+        }//end of for loop
 
-        if (closest == null) return new Vector2d(0, 0);
+        if (nearestGrass == null) return new Vector2d(0, 0); //if no grass found.
 
-        Vector2d desired = new Vector2d(closest.getWorldX() - worldX, closest.getWorldY() - worldY);
-        desired.normalize();
-        desired.mult(speed);
+        Vector2d idealPath = new Vector2d(nearestGrass.getWorldX() - worldX, nearestGrass.getWorldY() - worldY);
+        idealPath.normalize(); //find "step"
+        idealPath.mult(speed);
 
-        Vector2d steer = desired.copy();
-        steer.sub(velocity);
+        Vector2d steer = idealPath.copy();
+        steer.sub(currMovement);
 
         return steer;
     }
@@ -128,12 +128,12 @@ public class Bunny extends Animal {
         }
         center.div(bunnies.size());
 
-        Vector2d desired = new Vector2d(center.x - worldX, center.y - worldY);
-        desired.normalize();
-        desired.mult(speed);
+        Vector2d idealPath = new Vector2d(center.x - worldX, center.y - worldY);
+        idealPath.normalize();
+        idealPath.mult(speed);
 
-        Vector2d steer = desired.copy();
-        steer.sub(velocity);
+        Vector2d steer = idealPath.copy();
+        steer.sub(currMovement);
 
         return steer;
     }
