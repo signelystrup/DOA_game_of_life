@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.entities.Bunny;
+import com.example.demo.entities.Fence;
 import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
 
@@ -18,6 +19,7 @@ public class GamePanel extends JPanel implements Runnable{
     private GrassManager grassManager;
     private Bunny[] bunnies;
     private Wolf[] wolves;
+    private Fence[] fences;
     private Random random = new Random();
 
     public GamePanel(){
@@ -33,13 +35,18 @@ public class GamePanel extends JPanel implements Runnable{
         grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.GRID_CELL_SIZE);
         grassManager = new GrassManager(grid);
 
+        //fences: create some fences with different lengths
+        fences = new Fence[2];
+        fences[0] = new Fence(10);  // Fence with 10 segments
+        fences[1] = new Fence(3);   // Fence with 3 segments
+
         //bunnies: random placement
         bunnies = new Bunny[bunnyCount];
         for (int i = 0 ; i < bunnyCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
             bunnies[i] = new Bunny(randomX, randomY);
-            grid.insert(bunnies[i], bunnies[i].x, bunnies[i].y);
+            grid.insert(bunnies[i], bunnies[i].worldX, bunnies[i].worldY);
         }
 
         //wolves: random placement
@@ -48,7 +55,7 @@ public class GamePanel extends JPanel implements Runnable{
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
             wolves[i] = new Wolf(randomX, randomY);
-            grid.insert(wolves[i], wolves[i].x, wolves[i].y);
+            grid.insert(wolves[i], wolves[i].worldX, wolves[i].worldY);
         }
 
         //grass: random placement
@@ -101,6 +108,13 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
+        //fences: draw first (background layer)
+        for(int i = 0; i < fences.length; i ++){
+            if (fences[i] != null){
+                fences[i].draw(g2);
+            }
+        }
+
         // Draw all entities from grid
         List<Object> allEntities = grid.getAllEntities();
 
@@ -113,15 +127,6 @@ public class GamePanel extends JPanel implements Runnable{
                 ((Wolf)obj).draw(g2);
             }
         }
-
-        // Old drawing code (commented out)
-        //for (int i = 0; i < bunnies.length; i ++){
-        //    if (bunnies[i] != null) {
-        //        bunnies[i].draw(g2);
-        //    }
-        //}
-        //
-        //wolf.draw(g2);
 
         g2.dispose(); //good practice, Saves memory. (program still works without this line)
 
