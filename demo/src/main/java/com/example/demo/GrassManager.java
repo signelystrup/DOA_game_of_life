@@ -87,8 +87,8 @@ public class GrassManager {
             int newX = existingGrass.worldX + offsetX;
             int newY = existingGrass.worldY + offsetY;
 
-            newX = Math.max(0, Math.min(newX, 499));
-            newY = Math.max(0, Math.min(newY, 499));
+            newX = Math.max(0, Math.min(newX, GameConfig.WORLD_WIDTH - 1));
+            newY = Math.max(0, Math.min(newY, GameConfig.WORLD_HEIGHT - 1));
 
             if (grid.isEmpty(newX, newY)) {
                 Grass newGrass = new Grass(newX, newY);
@@ -104,8 +104,8 @@ public class GrassManager {
      * Creates new patches for colonization
      */
     private void spawnAtRandomLocation() {
-        int x = random.nextInt(500);
-        int y = random.nextInt(500);
+        int x = random.nextInt(GameConfig.WORLD_WIDTH);
+        int y = random.nextInt(GameConfig.WORLD_HEIGHT);
         int maxAttempts = 30;
 
         for (int i = 0; i < maxAttempts; i++) {
@@ -121,12 +121,12 @@ public class GrassManager {
 
             if (i % 2 == 0) {
                 // Move x if within bounds
-                if (x + offset >= 0 && x + offset <= 499) {
+                if (x + offset >= 0 && x + offset < GameConfig.WORLD_WIDTH) {
                     x += offset;
                 }
             } else {
                 // Move y if within bounds
-                if (y + offset >= 0 && y + offset <= 499) {
+                if (y + offset >= 0 && y + offset < GameConfig.WORLD_HEIGHT) {
                     y += offset;
                 }
             }

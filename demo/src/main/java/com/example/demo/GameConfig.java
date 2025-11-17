@@ -19,6 +19,6 @@ public class GameConfig {
     public static final int GRID_CELL_SIZE = Math.max(RABBIT_VISION, WOLF_VISION);
 
     // World dimensions
-    public static final int WORLD_WIDTH = 500;
-    public static final int WORLD_HEIGHT = 500;
+    public static final int WORLD_WIDTH = 1200;
+    public static final int WORLD_HEIGHT = 800;
 }

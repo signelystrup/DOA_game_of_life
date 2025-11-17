@@ -1,5 +1,7 @@
 package com.example.demo.entities;
 
+import com.example.demo.GameConfig;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -37,8 +39,8 @@ public class  Wolf extends Animal {
     public void findDest(){
         //rewrite with find path:
         Random r = new Random();
-        destX = r.nextInt(0,500);
-        destY = r.nextInt(0,500);
+        destX = r.nextInt(0, GameConfig.WORLD_WIDTH);
+        destY = r.nextInt(0, GameConfig.WORLD_HEIGHT);
     }
 
     public void loadSprite(){
