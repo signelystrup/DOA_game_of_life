@@ -46,7 +46,7 @@ public class GamePanel extends JPanel implements Runnable{
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
             bunnies[i] = new Bunny(randomX, randomY);
-            grid.insert(bunnies[i], bunnies[i].worldX, bunnies[i].worldY);
+            grid.insert(bunnies[i], bunnies[i].getWorldX(), bunnies[i].getWorldY());
         }
 
         //wolves: random placement
@@ -55,7 +55,7 @@ public class GamePanel extends JPanel implements Runnable{
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
             wolves[i] = new Wolf(randomX, randomY);
-            grid.insert(wolves[i], wolves[i].worldX, wolves[i].worldY);
+            grid.insert(wolves[i], wolves[i].getWorldX(), wolves[i].getWorldY());
         }
 
         //grass: random placement
@@ -101,7 +101,34 @@ public class GamePanel extends JPanel implements Runnable{
         //game logic here
         grassManager.update();
         //bunny.update();
+         // Update all bunnies
+    for (Bunny bunny : bunnies) {
+        bunny.update(grid);
     }
+
+    // Update all wolves
+    for (Wolf wolf : wolves) {
+        wolf.update(grid);
+    }
+
+    // No need to reinsert animals into the grid if they stay in the same cell
+    // But if you want moving animals to be in correct grid cells:
+    updateGridPositions();
+    }
+
+    private void updateGridPositions() {
+    grid.clear();
+
+
+    for (Bunny bunny : bunnies) {
+        grid.insert(bunny, bunny.getWorldX(), bunny.getWorldY());
+    }
+
+    for (Wolf wolf : wolves) {
+        grid.insert(wolf, wolf.getWorldX(), wolf.getWorldY());
+    }
+}
+
 
     @Override
     public void paintComponent(Graphics g){

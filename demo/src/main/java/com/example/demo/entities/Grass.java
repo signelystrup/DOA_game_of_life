@@ -1,10 +1,13 @@
 package com.example.demo.entities;
 
+import lombok.Getter;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+@Getter
 public class Grass {
     //made it public because they were being called from other packages, we could also do setters/getters to deal with this in future.
     public int worldX, worldY;
