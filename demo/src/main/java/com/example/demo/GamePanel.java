@@ -5,8 +5,11 @@ import com.example.demo.entities.Fence;
 import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +17,14 @@ public class GamePanel extends JPanel implements Runnable{
 
     private Thread gameThread;
     private final int FPS = 60;
-    
+
     // World size
     private final int WORLD_WIDTH = 500;
     private final int WORLD_HEIGHT = 500;
     private final int CELL_SIZE = 50;  // Grid cell size
+
+    //dirt sprite
+    private BufferedImage backgroundSprite;
 
     // Grid for spatial partitioning
     private Grid grid;
@@ -34,6 +40,8 @@ public class GamePanel extends JPanel implements Runnable{
         this.setPreferredSize(new Dimension(WORLD_WIDTH, WORLD_HEIGHT));
         this.setBackground(Color.PINK);
         this.setDoubleBuffered(true); //improve rendering performance.
+
+        loadSprite();
     }
 
     public void setUpGame(){
@@ -130,6 +138,9 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
+        //background.
+        draw(g2);
+
         // Draw grass first (background layer)
         for (Grass grass : grassList) {
             grass.draw(g2);
@@ -151,5 +162,20 @@ public class GamePanel extends JPanel implements Runnable{
         }
 
         g2.dispose(); //good practice, Saves memory.
+    }
+
+    public void draw(Graphics g2){
+        g2.drawImage(backgroundSprite, 0,0, WORLD_WIDTH, WORLD_HEIGHT, null);
+    }
+
+    public void loadSprite(){
+        if (backgroundSprite == null) {
+            try {
+                backgroundSprite = ImageIO.read(getClass().getResourceAsStream("/static/sprites/dirt.jpg"));
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+
     }
 }
