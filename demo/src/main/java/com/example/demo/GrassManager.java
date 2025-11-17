@@ -2,6 +2,7 @@ package com.example.demo;
 
 import com.example.demo.entities.Grass;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -20,6 +21,7 @@ public class GrassManager {
     private final int PROXIMITY_INTERVAL = 120;  // 2.0 seconds at 60 FPS
     private final int RANDOM_INTERVAL = 240;     // 4.0 seconds at 60 FPS
     private final int SPREAD_RADIUS = 25;        // Pixels
+    private final int MAX_GRASS_COUNT = 100;     // Maximum grass patches allowed
 
     public GrassManager(Grid grid) {
         this.grid = grid;
@@ -36,12 +38,16 @@ public class GrassManager {
 
         if (proximityTimer >= PROXIMITY_INTERVAL) {
             proximityTimer = 0;
-            spawnNearExistingGrass();
+            if (getGrassCount() < MAX_GRASS_COUNT) {
+                spawnNearExistingGrass();
+            }
         }
 
         if (randomTimer >= RANDOM_INTERVAL) {
             randomTimer = 0;
-            spawnAtRandomLocation();
+            if (getGrassCount() < MAX_GRASS_COUNT) {
+                spawnAtRandomLocation();
+            }
         }
     }
 
@@ -50,27 +56,21 @@ public class GrassManager {
      * Creates natural spreading and clustering
      */
     private void spawnNearExistingGrass() {
-        int attempts = 10;
+        List<Object> allEntities = grid.getAllEntities();
+        List<Grass> grassList = new ArrayList<>();
 
-        for (int i = 0; i < attempts; i++) {
-            int x = random.nextInt(500);
-            int y = random.nextInt(500);
-
-            List<Object> nearby = grid.findNearby(x, y);
-            Grass foundGrass = null;
-
-            for (Object obj : nearby) {
-                if (obj instanceof Grass) {
-                    foundGrass = (Grass) obj;
-                    break;
-                }
-            }
-
-            if (foundGrass != null) {
-                spawnNearGrass(foundGrass);
-                return;
+        for (Object obj : allEntities) {
+            if (obj instanceof Grass) {
+                grassList.add((Grass) obj);
             }
         }
+
+        if (grassList.isEmpty()) {
+            return;
+        }
+
+        Grass randomGrass = grassList.get(random.nextInt(grassList.size()));
+        spawnNearGrass(randomGrass);
     }
 
     /**
@@ -104,18 +104,48 @@ public class GrassManager {
      * Creates new patches for colonization
      */
     private void spawnAtRandomLocation() {
-        int maxAttempts = 10;
+        int x = random.nextInt(500);
+        int y = random.nextInt(500);
+        int maxAttempts = 30;
 
         for (int i = 0; i < maxAttempts; i++) {
-            int x = random.nextInt(500);
-            int y = random.nextInt(500);
-
             if (grid.isEmpty(x, y)) {
                 Grass grass = new Grass(x, y);
                 grid.insert(grass, x, y);
                 //System.out.println("New grass patch spawned at (" + x + ", " + y + ")");
                 return;
             }
+
+            // Move to nearby position - randomize direction
+            int offset = random.nextBoolean() ? 25 : -25;
+
+            if (i % 2 == 0) {
+                // Move x if within bounds
+                if (x + offset >= 0 && x + offset <= 499) {
+                    x += offset;
+                }
+            } else {
+                // Move y if within bounds
+                if (y + offset >= 0 && y + offset <= 499) {
+                    y += offset;
+                }
+            }
         }
+    }
+
+    /**
+     * Count total grass entities in the grid
+     */
+    private int getGrassCount() {
+        List<Object> allEntities = grid.getAllEntities();
+        int count = 0;
+
+        for (Object obj : allEntities) {
+            if (obj instanceof Grass) {
+                count++;
+            }
+        }
+
+        return count;
     }
 }
