@@ -26,10 +26,10 @@ public abstract class Animal {
         this.speed = speed;
         this.visionRadius = visionRadius;
         
-//        // Initialize with random velocity
-//        this.velocity = new Vector2d(Math.random() - 0.5, Math.random() - 0.5);
-//        this.velocity.setMagnitude(speed);
-//
+        // Initialize with random velocity
+        this.velocity = new Vector2d(Math.random() - 0.5, Math.random() - 0.5);
+        this.velocity.setMagnitude(speed);
+
         gridX = 0; //TODO: calculate.
         gridY = 0;
     }
