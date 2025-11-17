@@ -8,6 +8,7 @@ import java.io.IOException;
 public class Grass {
     //made it public because they were being called from other packages, we could also do setters/getters to deal with this in future.
     public int worldX, worldY;
+
     protected int gridX, gridY;
     static BufferedImage sprite;
 

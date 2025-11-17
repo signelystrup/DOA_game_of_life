@@ -1,17 +1,20 @@
 package com.example.demo.entities;
 
+import com.example.demo.Grid;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Random;
+import java.util.List;
 
-public class  Wolf extends Animal {
-    static final int SPEED = 6;
+public class Wolf extends Animal {
+    static final double SPEED = 2.5;
+    static final double VISION = 100.0;  // Wolves see a bit farther
     static BufferedImage sprite;
 
-    public Wolf(int worldX, int worldY){
-        super(worldX, worldY);
+    public Wolf(int x, int y){
+        super(x, y, SPEED, VISION);
         loadSprite();
     }
 
@@ -21,24 +24,51 @@ public class  Wolf extends Animal {
     }
 
     @Override
-    public void update(){
-        if (worldX == destX && worldY == destY){
-            findDest();
+    protected Vector2d calculateSteeringForce(Grid grid) {
+        Vector2d steering = new Vector2d(0, 0);
+
+        // Get nearby animals from grid
+        List<Animal> nearbyAnimals = getAnimalsInVision(grid);
+        List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
+
+        // SEEK bunnies (hunt them!)
+        if (!nearbyBunnies.isEmpty()) {
+            Vector2d seekForce = seekBunny(nearbyBunnies);
+            seekForce.mult(2.0);  // Strong hunting instinct
+            steering.add(seekForce);
         }
 
-        move();
+        steering.limit(maxForce);
+        return steering;
     }
 
-    @Override
-    public void move(){
-        super.move();
-    }
+    // Seek: hunt the closest bunny
+    private Vector2d seekBunny(List<Bunny> bunnies) {
+        // Find closest bunny
+        Bunny closest = null;
+        double minDist = Double.MAX_VALUE;
 
-    public void findDest(){
-        //rewrite with find path:
-        Random r = new Random();
-        destX = r.nextInt(0,500);
-        destY = r.nextInt(0,500);
+        for (Bunny bunny : bunnies) {
+            double dx = worldX - bunny.getWorldX();
+            double dy = worldY - bunny.getWorldY();
+            double dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < minDist) {
+                minDist = dist;
+                closest = bunny;
+            }
+        }
+
+        if (closest == null) return new Vector2d(0, 0);
+
+        Vector2d desired = new Vector2d(closest.getWorldX() - worldX, closest.getWorldY() - worldY);
+        desired.normalize();
+        desired.mult(speed);
+
+        Vector2d steer = desired.copy();
+        steer.sub(velocity);
+
+        return steer;
     }
 
     public void loadSprite(){
@@ -47,7 +77,7 @@ public class  Wolf extends Animal {
                 sprite = ImageIO.read(getClass().getResourceAsStream("/static/sprites/wolf.png"));
             }catch(IOException e){
                 e.printStackTrace();
-            }//end of catch
-        }//end of if.
+            }
+        }
     }
 }
