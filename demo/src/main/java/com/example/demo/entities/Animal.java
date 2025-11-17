@@ -12,13 +12,12 @@ import java.util.List;
 @Setter
 public abstract class Animal {
     protected int worldX, worldY;
-    protected int gridX, gridY;
 
     // Add flocking stuff
-    protected Vector2d velocity;
+    protected Vector2d currMovement;
     protected double speed;
     protected double visionRadius;
-    protected double maxForce = 0.3;
+    protected double maxForce = 0.3; //how fast an animal can turn
 
     protected int destX, destY;
 
@@ -29,11 +28,8 @@ public abstract class Animal {
         this.visionRadius = visionRadius;
 
         // Initialize with random velocity
-        this.velocity = new Vector2d(Math.random() - 0.5, Math.random() - 0.5);
-        this.velocity.setMagnitude(speed);
-
-        gridX = 0; //TODO: calculate.
-        gridY = 0;
+        this.currMovement = new Vector2d(Math.random() - 0.5, Math.random() - 0.5); //x and y must be between -0.5 and 0.5
+        this.currMovement.setMagnitude(speed);
     }
 
     public abstract void draw(Graphics2D g2);
@@ -43,13 +39,17 @@ public abstract class Animal {
         Vector2d steering = calculateSteeringForce(grid);
 
         // Apply steering
-        velocity.add(steering);
-        velocity.setMagnitude(speed);  // Keep speed constant
+        currMovement.add(steering);
+        currMovement.setMagnitude(speed);  // Keep speed constant
 
         // Update position
-        worldX += (int)velocity.x;
-        worldY += (int)velocity.y;
+        worldX += (int) currMovement.x;
+        worldY += (int) currMovement.y;
 
+        wrapAroundField();
+    }
+
+    private void wrapAroundField(){
         // Wrap around edges (500x500 from GamePanel)
         if (worldX < 0) worldX = 500;
         if (worldX > 500) worldX = 0;
