@@ -1,9 +1,9 @@
 package com.example.demo.entities;
 
+import com.example.demo.GameConfig;
 import com.example.demo.Grid;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import static java.lang.Math.sqrt;
 @Getter
 @Setter
 public abstract class Animal {
-    protected int worldX, worldY;
+    public int worldX, worldY;
     protected int gridX, gridY;
 
     // Add flocking stuff
@@ -52,11 +52,11 @@ public abstract class Animal {
         worldX += (int)velocity.x;
         worldY += (int)velocity.y;
 
-        // Wrap around edges (500x500 from GamePanel)
-        if (worldX < 0) worldX = 500;
-        if (worldX > 500) worldX = 0;
-        if (worldY < 0) worldY = 500;
-        if (worldY > 500) worldY = 0;
+        // Wrap around edges
+        if (worldX < 0) worldX = GameConfig.WORLD_WIDTH;
+        if (worldX > GameConfig.WORLD_WIDTH) worldX = 0;
+        if (worldY < 0) worldY = GameConfig.WORLD_HEIGHT;
+        if (worldY > GameConfig.WORLD_HEIGHT) worldY = 0;
     }
 
     protected abstract Vector2d calculateSteeringForce(Grid grid);

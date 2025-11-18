@@ -4,11 +4,12 @@ import com.example.demo.entities.Bunny;
 import com.example.demo.entities.Fence;
 import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
+import com.example.demo.entities.Animal;
 
+import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable{
 
@@ -17,8 +18,8 @@ public class GamePanel extends JPanel implements Runnable{
 
     private Grid grid;
     private GrassManager grassManager;
-    private Bunny[] bunnies = new Bunny[0];
-    private Wolf[] wolves = new Wolf[0];
+    private List<Bunny> bunnies = new ArrayList<>();
+    private List<Wolf> wolves = new ArrayList<>();
     private Fence[] fences = new Fence[0];
     private Random random = new Random();
 
@@ -43,21 +44,23 @@ public class GamePanel extends JPanel implements Runnable{
         }
 
         //bunnies: random placement
-        bunnies = new Bunny[bunnyCount];
+        //bunnies = new Bunny[bunnyCount];
         for (int i = 0 ; i < bunnyCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
-            bunnies[i] = new Bunny(randomX, randomY);
-            grid.insert(bunnies[i], bunnies[i].getWorldX(), bunnies[i].getWorldY());
+            Bunny bunny = new Bunny(randomX, randomY);
+            bunnies.add(bunny);
+            grid.insert(bunnies.get(i), bunnies.get(i).getWorldX(), bunnies.get(i).getWorldY());
         }
 
         //wolves: random placement
-        wolves = new Wolf[wolfCount];
+        //wolves = new Wolf[wolfCount];
         for (int i = 0 ; i < wolfCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
-            wolves[i] = new Wolf(randomX, randomY);
-            grid.insert(wolves[i], wolves[i].getWorldX(), wolves[i].getWorldY());
+            Wolf wolf = new Wolf(randomX, randomY);
+            wolves.add(wolf);
+            grid.insert(wolves.get(i), wolves.get(i).getWorldX(), wolves.get(i).getWorldY());
         }
 
         //grass: random placement
@@ -106,32 +109,25 @@ public class GamePanel extends JPanel implements Runnable{
         }
         //bunny.update();
          // Update all bunnies
-    for (Bunny bunny : bunnies) {
-        bunny.update(grid);
+        for (Bunny bunny : bunnies) {
+            moveEntity(bunny);
+        }
+
+        // Update all wolves
+        for (Wolf wolf : wolves) {
+            moveEntity(wolf);
+        }
+
+
     }
-
-    // Update all wolves
-    for (Wolf wolf : wolves) {
-        wolf.update(grid);
+    private void moveEntity(Animal animal) {
+      // Remove from old grid position
+      grid.remove(animal, animal.getWorldX(), animal.getWorldY());
+      // Update movement
+      animal.update(grid);
+      // Insert into new grid position
+      grid.insert(animal, animal.getWorldX(), animal.getWorldY());
     }
-
-    // No need to reinsert animals into the grid if they stay in the same cell
-    // But if you want moving animals to be in correct grid cells:
-    updateGridPositions();
-    }
-
-    private void updateGridPositions() {
-    grid.clear();
-
-
-    for (Bunny bunny : bunnies) {
-        grid.insert(bunny, bunny.getWorldX(), bunny.getWorldY());
-    }
-
-    for (Wolf wolf : wolves) {
-        grid.insert(wolf, wolf.getWorldX(), wolf.getWorldY());
-    }
-}
 
 
     @Override
@@ -181,7 +177,8 @@ public class GamePanel extends JPanel implements Runnable{
 
             if (grid.isEmpty(randomX, randomY)) {
                 Wolf newWolf = new Wolf(randomX, randomY);
-                grid.insert(newWolf, newWolf.worldX, newWolf.worldY);
+                wolves.add(newWolf);
+                grid.insert(newWolf, newWolf.getWorldX(), newWolf.getWorldY());
                 return;
             }
         }
@@ -200,7 +197,8 @@ public class GamePanel extends JPanel implements Runnable{
 
             if (grid.isEmpty(randomX, randomY)) {
                 Bunny newBunny = new Bunny(randomX, randomY);
-                grid.insert(newBunny, newBunny.worldX, newBunny.worldY);
+                bunnies.add(newBunny);
+                grid.insert(newBunny, newBunny.getWorldX(), newBunny.getWorldY());
                 return;
             }
         }
@@ -219,7 +217,7 @@ public class GamePanel extends JPanel implements Runnable{
 
             if (grid.isEmpty(randomX, randomY)) {
                 Grass newGrass = new Grass(randomX, randomY);
-                grid.insert(newGrass, newGrass.worldX, newGrass.worldY);
+                grid.insert(newGrass, newGrass.getWorldX(), newGrass.getWorldY());
                 return;
             }
         }
@@ -246,6 +244,8 @@ public class GamePanel extends JPanel implements Runnable{
         if (grid != null) {
             grid.clear();
         }
+        bunnies.clear();
+        wolves.clear();
         setUpGame(bunnyCount, wolfCount, grassCount, fenceCount);
     }
 
