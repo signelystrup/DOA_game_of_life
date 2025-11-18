@@ -24,7 +24,7 @@ public class Vector2d {
     }
     
     public void div(double scalar) { 
-        if (scalar != 0) {
+        if (scalar != 0) { //scalar = some value. what we want to divide by.
             x /= scalar; 
             y /= scalar; 
         }
@@ -36,7 +36,7 @@ public class Vector2d {
     
     public void normalize() { 
         double m = magnitude();
-        if (m > 0) div(m);
+        if (m > 0) div(m); // a/c and b/c
     }
     
     public void setMagnitude(double newMag) {

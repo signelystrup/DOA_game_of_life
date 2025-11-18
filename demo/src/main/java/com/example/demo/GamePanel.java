@@ -6,15 +6,22 @@ import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
 import com.example.demo.entities.Animal;
 
-import java.util.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable{
 
     private Thread gameThread;
     private final int FPS = 60;
+
+    //dirt sprite
+    private BufferedImage backgroundSprite;
 
     private Grid grid;
     private GrassManager grassManager;
@@ -27,7 +34,9 @@ public class GamePanel extends JPanel implements Runnable{
         //screen settings
         this.setPreferredSize(new Dimension(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT));
         this.setBackground(Color.PINK);
-        this.setDoubleBuffered(true); //improve rending performance.
+        this.setDoubleBuffered(true); //improve rendering performance.
+
+        loadSprite();
     }
 
     public void setUpGame(int bunnyCount, int wolfCount, int grassCount, int fenceCount){
@@ -135,7 +144,10 @@ public class GamePanel extends JPanel implements Runnable{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
-        //fences: draw first (background layer)
+        //background
+        drawBackground(g2);
+
+        //fences: draw first (foreground layer)
         for(int i = 0; i < fences.length; i ++){
             if (fences[i] != null){
                 fences[i].draw(g2);
@@ -256,4 +268,17 @@ public class GamePanel extends JPanel implements Runnable{
         return gameThread != null;
     }
 
+    public void drawBackground(Graphics2D g2){
+        g2.drawImage(backgroundSprite, 0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, null);
+    }
+
+    public void loadSprite(){
+        if (backgroundSprite == null) {
+            try {
+                backgroundSprite = ImageIO.read(getClass().getResourceAsStream("/static/sprites/dirt.jpg"));
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
 }
