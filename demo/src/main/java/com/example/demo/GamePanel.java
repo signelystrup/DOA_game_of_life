@@ -118,13 +118,14 @@ public class GamePanel extends JPanel implements Runnable{
         }
         //bunny.update();
          // Update all bunnies
-        for (Bunny bunny : bunnies) {
-            moveEntity(bunny);
+        for(int i = 0; i < bunnies.size(); i++){
+        //for (Bunny bunny : bunnies) {
+            moveEntity(bunnies.get(i));
         }
 
         // Update all wolves
-        for (Wolf wolf : wolves) {
-            moveEntity(wolf);
+        for(int i = 0; i < wolves.size(); i++) {
+            moveEntity(wolves.get(i));
         }
 
 
@@ -162,7 +163,8 @@ public class GamePanel extends JPanel implements Runnable{
 
         List<Object> allEntities = grid.getAllEntities();
 
-        for (Object obj : allEntities) {
+        for (int i = 0; i < allEntities.size(); i++) {
+            Object obj = allEntities.get(i);
             if (obj instanceof Grass) {
                 ((Grass)obj).draw(g2);
             } else if (obj instanceof Bunny) {
