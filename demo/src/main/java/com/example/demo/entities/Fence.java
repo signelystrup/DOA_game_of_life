@@ -1,5 +1,6 @@
 package com.example.demo.entities;
 
+import com.example.demo.GameConfig;
 import lombok.Getter;
 
 import javax.imageio.ImageIO;
@@ -81,8 +82,8 @@ public class Fence {
 
         //create segments:
         Random r = new Random();
-        int startX = r.nextInt(0,500);
-        int startY = r.nextInt(0,500);
+        int startX = r.nextInt(0, GameConfig.WORLD_WIDTH);
+        int startY = r.nextInt(0, GameConfig.WORLD_HEIGHT);
         int prevX = startX - 10;
         int prevY = startY  - 10;
 
