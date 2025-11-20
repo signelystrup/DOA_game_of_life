@@ -104,13 +104,17 @@ public class Fence {
 
         for (int i = 0; i < fence.length; i ++) {
             Segment segment = fence[i];
-            BufferedImage sprite = null;
+            BufferedImage sprite;
+
 
             int width = 24;
             int height = 24;
+            int x = Math.min(segment.getStartX(), segment.getEndX()) ;
+            int y = Math.max(segment.getStartY(), segment.getEndX()) - height ;
 
             if (segment.getStartX() == segment.getEndX()){
                 sprite = verticalSprite;
+                x -= 20;
             }else if (segment.getStartY() == segment.getEndY()){
                 sprite = horizontalSprite;
             }else if (     segment.getStartX() < segment.getEndX()
@@ -119,14 +123,16 @@ public class Fence {
                         && segment.getStartY() > segment.getEndY()){
                 sprite = sDiagonalSprite;
                 height *= 2;
+                y -= 16;
             }else{
                 sprite = zDiagonalSprite;
                 height *= 2;
+                y -= 16;
             }
 
             //g2.drawLine(fence[i].getStartX(), fence[i].getStartY(), fence[i].getEndX(), fence[i].getEndY());
 
-            g2.drawImage(sprite, segment.getStartX(), segment.getStartY(), width, height, null);
+            g2.drawImage(sprite, x, y, width, height, null);
         }//end of for loop.
     }
 
