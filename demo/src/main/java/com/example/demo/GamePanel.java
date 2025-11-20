@@ -4,6 +4,7 @@ import com.example.demo.entities.Bunny;
 import com.example.demo.entities.Fence;
 import com.example.demo.entities.Grass;
 import com.example.demo.entities.Wolf;
+import com.example.demo.entities.Animal;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -12,66 +13,71 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable{
 
     private Thread gameThread;
     private final int FPS = 60;
 
-    // World size
-    private final int WORLD_WIDTH = 500;
-    private final int WORLD_HEIGHT = 500;
-    private final int CELL_SIZE = 50;  // Grid cell size
-
     //dirt sprite
     private BufferedImage backgroundSprite;
 
-    // Grid for spatial partitioning
     private Grid grid;
-    
-    // Entities
+    private GrassManager grassManager;
     private List<Bunny> bunnies = new ArrayList<>();
     private List<Wolf> wolves = new ArrayList<>();
-    private List<Grass> grassList = new ArrayList<>();
-    private List<Fence> fences = new ArrayList<>();
+    private Fence[] fences = new Fence[0];
+    private Random random = new Random();
 
     public GamePanel(){
         //screen settings
-        this.setPreferredSize(new Dimension(WORLD_WIDTH, WORLD_HEIGHT));
+        this.setPreferredSize(new Dimension(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT));
         this.setBackground(Color.PINK);
         this.setDoubleBuffered(true); //improve rendering performance.
 
         loadSprite();
     }
 
-    public void setUpGame(){
-        // Initialize grid
-        grid = new Grid(WORLD_WIDTH, WORLD_HEIGHT, CELL_SIZE);
-        
-        // Create bunnies
-        for (int i = 0; i < 10; i++){
-            int x = (int)(Math.random() * WORLD_WIDTH);
-            int y = (int)(Math.random() * WORLD_HEIGHT);
-            bunnies.add(new Bunny(x, y));
+    public void setUpGame(int bunnyCount, int wolfCount, int grassCount, int fenceCount){
+        //init grid and entities here.
+        // Cell size = max(vision ranges) to ensure findNearby() works for all species
+        grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.GRID_CELL_SIZE);
+        grassManager = new GrassManager(grid);
+
+        //fences: create random fences with random lengths
+        fences = new Fence[fenceCount];
+        for (int i = 0; i < fenceCount; i++) {
+            int randomLength = random.nextInt(5, 15);  // Random length between 5-14 segments
+            fences[i] = new Fence(randomLength);
         }
-        
-        // Create wolves
-        for (int i = 0; i < 3; i++){
-            int x = (int)(Math.random() * WORLD_WIDTH);
-            int y = (int)(Math.random() * WORLD_HEIGHT);
-            wolves.add(new Wolf(x, y));
+
+        //bunnies: random placement
+        //bunnies = new Bunny[bunnyCount];
+        for (int i = 0 ; i < bunnyCount ; i ++){
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+            Bunny bunny = new Bunny(randomX, randomY);
+            bunnies.add(bunny);
+            grid.insert(bunnies.get(i), bunnies.get(i).getWorldX(), bunnies.get(i).getWorldY());
         }
-        
-        // Create grass patches
-        for (int i = 0; i < 20; i++){
-            int x = (int)(Math.random() * WORLD_WIDTH);
-            int y = (int)(Math.random() * WORLD_HEIGHT);
-            grassList.add(new Grass(x, y));
+
+        //wolves: random placement
+        //wolves = new Wolf[wolfCount];
+        for (int i = 0 ; i < wolfCount ; i ++){
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+            Wolf wolf = new Wolf(randomX, randomY);
+            wolves.add(wolf);
+            grid.insert(wolves.get(i), wolves.get(i).getWorldX(), wolves.get(i).getWorldY());
         }
-        
-        // Create fences
-        for (int i = 0; i < 3; i++){
-            fences.add(new Fence(10)); // 10 segments per fence
+
+        //grass: random placement
+        for (int i = 0 ; i < grassCount ; i ++){
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+            Grass grass = new Grass(randomX, randomY);
+            grid.insert(grass, randomX, randomY);
         }
     }
 
@@ -83,7 +89,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     @Override
     public void run(){
-        double drawInterval = 1000000000.0 / FPS; //1/60 second.
+        double drawInterval = 1000000000 / FPS; //1/60 second.
         double delta = 0;
         long lastTime = System.nanoTime();
         long currentTime;
@@ -106,66 +112,166 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void update(){
-        // Clear and rebuild grid each frame
-        grid.clear();
-        
-        // Insert all entities into grid using worldX and worldY
-        for (Bunny bunny : bunnies) {
-            grid.insert(bunny, bunny.getWorldX(), bunny.getWorldY());
+        //game logic here
+        if (grassManager != null) {
+            grassManager.update();
         }
-        for (Wolf wolf : wolves) {
-            grid.insert(wolf, wolf.getWorldX(), wolf.getWorldY());
+        //bunny.update();
+         // Update all bunnies
+        for(int i = 0; i < bunnies.size(); i++){
+        //for (Bunny bunny : bunnies) {
+            moveEntity(bunnies.get(i));
         }
-        for (Grass grass : grassList) {
-            grid.insert(grass, grass.getWorldX(), grass.getWorldY());
+
+        // Update all wolves
+        for(int i = 0; i < wolves.size(); i++) {
+            moveEntity(wolves.get(i));
         }
-        
-        // Update all bunnies with flocking
-        for (Bunny bunny : bunnies) {
-            bunny.update(grid);
-        }
-        
-        // Update all wolves with flocking
-        for (Wolf wolf : wolves) {
-            wolf.update(grid);
-        }
-        
-        // TODO: Check for eating grass, collisions, etc.
+
+
     }
+    private void moveEntity(Animal animal) {
+      // Remove from old grid position
+      grid.remove(animal, animal.getWorldX(), animal.getWorldY());
+      // Update movement
+      animal.update(grid);
+      // Insert into new grid position
+      grid.insert(animal, animal.getWorldX(), animal.getWorldY());
+    }
+
 
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g; //get graphics as Graphics2D
 
-        //background.
-        draw(g2);
+        //background
+        drawBackground(g2);
 
-        // Draw grass first (background layer)
-        for (Grass grass : grassList) {
-            grass.draw(g2);
-        }
-        
-        // Draw fences
-        for (Fence fence : fences) {
-            fence.draw(g2);
-        }
-        
-        // Draw bunnies
-        for (Bunny bunny : bunnies) {
-            bunny.draw(g2);
-        }
-        
-        // Draw wolves
-        for (Wolf wolf : wolves) {
-            wolf.draw(g2);
+        //fences: draw first (foreground layer)
+        for(int i = 0; i < fences.length; i ++){
+            if (fences[i] != null){
+                fences[i].draw(g2);
+            }
         }
 
-        g2.dispose(); //good practice, Saves memory.
+        // Draw all entities from grid (only if grid is initialized)
+        if (grid == null) {
+            g2.dispose();
+            return;
+        }
+
+        List<Object> allEntities = grid.getAllEntities();
+
+        for (int i = 0; i < allEntities.size(); i++) {
+            Object obj = allEntities.get(i);
+            if (obj instanceof Grass) {
+                ((Grass)obj).draw(g2);
+            } else if (obj instanceof Bunny) {
+                ((Bunny)obj).draw(g2);
+            } else if (obj instanceof Wolf) {
+                ((Wolf)obj).draw(g2);
+            }
+        }
+
+        g2.dispose(); //good practice, Saves memory. (program still works without this line)
+
     }
 
-    public void draw(Graphics g2){
-        g2.drawImage(backgroundSprite, 0,0, WORLD_WIDTH, WORLD_HEIGHT, null);
+    /**
+     * Add a single wolf at random empty position
+     */
+    public void addWolf() {
+        if (grid == null) return;
+
+        int maxAttempts = 20;
+        for (int i = 0; i < maxAttempts; i++) {
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+
+            if (grid.isEmpty(randomX, randomY)) {
+                Wolf newWolf = new Wolf(randomX, randomY);
+                wolves.add(newWolf);
+                grid.insert(newWolf, newWolf.getWorldX(), newWolf.getWorldY());
+                return;
+            }
+        }
+    }
+
+    /**
+     * Add a single bunny at random empty position
+     */
+    public void addBunny() {
+        if (grid == null) return;
+
+        int maxAttempts = 20;
+        for (int i = 0; i < maxAttempts; i++) {
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+
+            if (grid.isEmpty(randomX, randomY)) {
+                Bunny newBunny = new Bunny(randomX, randomY);
+                bunnies.add(newBunny);
+                grid.insert(newBunny, newBunny.getWorldX(), newBunny.getWorldY());
+                return;
+            }
+        }
+    }
+
+    /**
+     * Add a single grass at random empty position
+     */
+    public void addGrass() {
+        if (grid == null) return;
+
+        int maxAttempts = 20;
+        for (int i = 0; i < maxAttempts; i++) {
+            int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
+            int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
+
+            if (grid.isEmpty(randomX, randomY)) {
+                Grass newGrass = new Grass(randomX, randomY);
+                grid.insert(newGrass, newGrass.getWorldX(), newGrass.getWorldY());
+                return;
+            }
+        }
+    }
+
+    /**
+     * Add a single fence with random length
+     */
+    public void addFence() {
+        int randomLength = random.nextInt(5, 15);
+        Fence newFence = new Fence(randomLength);
+
+        // Expand fences array
+        Fence[] newFences = new Fence[fences.length + 1];
+        System.arraycopy(fences, 0, newFences, 0, fences.length);
+        newFences[fences.length] = newFence;
+        fences = newFences;
+    }
+
+    /**
+     * Reset game to initial state
+     */
+    public void resetGame(int bunnyCount, int wolfCount, int grassCount, int fenceCount) {
+        if (grid != null) {
+            grid.clear();
+        }
+        bunnies.clear();
+        wolves.clear();
+        setUpGame(bunnyCount, wolfCount, grassCount, fenceCount);
+    }
+
+    /**
+     * Check if game thread is running
+     */
+    public boolean isGameRunning() {
+        return gameThread != null;
+    }
+
+    public void drawBackground(Graphics2D g2){
+        g2.drawImage(backgroundSprite, 0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, null);
     }
 
     public void loadSprite(){
@@ -176,6 +282,5 @@ public class GamePanel extends JPanel implements Runnable{
                 e.printStackTrace();
             }
         }
-
     }
 }

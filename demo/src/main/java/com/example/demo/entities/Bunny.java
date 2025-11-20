@@ -1,6 +1,8 @@
 package com.example.demo.entities;
 
+import com.example.demo.GameConfig;
 import com.example.demo.Grid;
+
 import lombok.Getter;
 import lombok.Setter;
 

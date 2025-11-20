@@ -92,6 +92,24 @@ public class Grid {
     }
 
     /**
+     * Get all entities from the grid
+     * Useful for rendering or iterating over all entities
+     *
+     * @return List containing all entities from all cells
+     */
+    public List<Object> getAllEntities() {
+        List<Object> allEntities = new ArrayList<>();
+
+        for (int x = 0; x < gridWidth; x++) {
+            for (int y = 0; y < gridHeight; y++) {
+                allEntities.addAll(cells[x][y]);
+            }
+        }
+
+        return allEntities;
+    }
+
+    /**
      * Check if a cell is empty at given position
      */
     public boolean isEmpty(float worldX, float worldY) {
