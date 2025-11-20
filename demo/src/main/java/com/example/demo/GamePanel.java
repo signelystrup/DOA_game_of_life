@@ -30,6 +30,12 @@ public class GamePanel extends JPanel implements Runnable{
     private Fence[] fences = new Fence[0];
     private Random random = new Random();
 
+    // Performance metrics tracking - accumulate over entire game session
+    private VisionMetrics totalBunnyMetrics = new VisionMetrics();
+    private VisionMetrics totalWolfMetrics = new VisionMetrics();
+    private long gameStartTime = 0;
+    private int totalFrames = 0;
+
     public GamePanel(){
         //screen settings
         this.setPreferredSize(new Dimension(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT));
@@ -84,6 +90,10 @@ public class GamePanel extends JPanel implements Runnable{
     public void startGameThread(){
         gameThread = new Thread(this);
         gameThread.start(); //calls run method.
+        gameStartTime = System.currentTimeMillis();
+        totalFrames = 0;
+        totalBunnyMetrics.reset();
+        totalWolfMetrics.reset();
         System.out.println("game start");
     }
 
@@ -116,10 +126,17 @@ public class GamePanel extends JPanel implements Runnable{
         if (grassManager != null) {
             grassManager.update();
         }
-        //bunny.update();
-         // Update all bunnies
+
+        // Reset per-frame metrics
+        for (Bunny bunny : bunnies) {
+            bunny.metrics.reset();
+        }
+        for (Wolf wolf : wolves) {
+            wolf.metrics.reset();
+        }
+
+        // Update all bunnies
         for(int i = 0; i < bunnies.size(); i++){
-        //for (Bunny bunny : bunnies) {
             moveEntity(bunnies.get(i));
         }
 
@@ -128,7 +145,15 @@ public class GamePanel extends JPanel implements Runnable{
             moveEntity(wolves.get(i));
         }
 
+        // Accumulate metrics from this frame
+        for (Bunny bunny : bunnies) {
+            totalBunnyMetrics.add(bunny.metrics);
+        }
+        for (Wolf wolf : wolves) {
+            totalWolfMetrics.add(wolf.metrics);
+        }
 
+        totalFrames++;
     }
     private void moveEntity(Animal animal) {
       // Remove from old grid position
@@ -253,14 +278,25 @@ public class GamePanel extends JPanel implements Runnable{
 
     /**
      * Reset game to initial state
+     * Prints final metrics before resetting
      */
     public void resetGame(int bunnyCount, int wolfCount, int grassCount, int fenceCount) {
+        // Print metrics from previous session
+        printFinalMetrics();
+
+        // Clear and reset
         if (grid != null) {
             grid.clear();
         }
         bunnies.clear();
         wolves.clear();
         setUpGame(bunnyCount, wolfCount, grassCount, fenceCount);
+
+        // Reset metrics for new session
+        gameStartTime = System.currentTimeMillis();
+        totalFrames = 0;
+        totalBunnyMetrics.reset();
+        totalWolfMetrics.reset();
     }
 
     /**
@@ -268,6 +304,51 @@ public class GamePanel extends JPanel implements Runnable{
      */
     public boolean isGameRunning() {
         return gameThread != null;
+    }
+
+    /**
+     * Print final performance metrics for entire game session
+     */
+    public void printFinalMetrics() {
+        if (gameStartTime == 0) {
+            System.out.println("No metrics to display - game hasn't started yet.");
+            return;
+        }
+
+        long duration = System.currentTimeMillis() - gameStartTime;
+        double durationSeconds = duration / 1000.0;
+
+        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║          FINAL VISION PERFORMANCE METRICS                      ║");
+        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        System.out.println("\nStrategy: " + GameConfig.STRATEGY);
+        System.out.println("Description: " + GameConfig.getStrategyDescription());
+        System.out.println("Cell Size: " + GameConfig.GRID_CELL_SIZE + "px");
+        System.out.println("\nSession Duration: " + String.format("%.1f", durationSeconds) + " seconds");
+        System.out.println("Total Frames: " + totalFrames);
+        System.out.println("Average FPS: " + String.format("%.1f", totalFrames / durationSeconds));
+
+        System.out.println("\n─────────────────────────────────────────────────────────────────");
+        System.out.println("BUNNIES (count: " + bunnies.size() + ")");
+        System.out.println("─────────────────────────────────────────────────────────────────");
+        System.out.println(totalBunnyMetrics);
+        System.out.println("Average per frame: " +
+            String.format("%.1f fetched, %.1f in vision, %.1f wasted",
+                totalBunnyMetrics.getEntitiesFetched() / (double)totalFrames,
+                totalBunnyMetrics.getEntitiesInVision() / (double)totalFrames,
+                totalBunnyMetrics.getWastedEntities() / (double)totalFrames));
+
+        System.out.println("\n─────────────────────────────────────────────────────────────────");
+        System.out.println("WOLVES (count: " + wolves.size() + ")");
+        System.out.println("─────────────────────────────────────────────────────────────────");
+        System.out.println(totalWolfMetrics);
+        System.out.println("Average per frame: " +
+            String.format("%.1f fetched, %.1f in vision, %.1f wasted",
+                totalWolfMetrics.getEntitiesFetched() / (double)totalFrames,
+                totalWolfMetrics.getEntitiesInVision() / (double)totalFrames,
+                totalWolfMetrics.getWastedEntities() / (double)totalFrames));
+
+        System.out.println("\n═════════════════════════════════════════════════════════════════\n");
     }
 
     public void drawBackground(Graphics2D g2){
