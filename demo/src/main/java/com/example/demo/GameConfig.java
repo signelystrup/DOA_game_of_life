@@ -21,7 +21,7 @@ public class GameConfig {
     public static final int GRID_CELL_SIZE = STRATEGY.getCellSize();
 
     // World dimensions
-    public static final int WORLD_WIDTH = 1200;
+    public static final int WORLD_WIDTH = 1300;
     public static final int WORLD_HEIGHT = 800;
 
     /**
