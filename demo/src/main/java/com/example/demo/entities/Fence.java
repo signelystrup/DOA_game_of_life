@@ -2,8 +2,10 @@ package com.example.demo.entities;
 
 import lombok.Getter;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Random;
 
 public class Fence {
@@ -77,6 +79,7 @@ public class Fence {
     public Fence (int length){
         fence = new Segment[length];
 
+        //create segments:
         Random r = new Random();
         int startX = r.nextInt(0,500);
         int startY = r.nextInt(0,500);
@@ -91,18 +94,52 @@ public class Fence {
             prevX = fence[i].getStartX();
             prevY = fence[i].getStartY();
         }
+
+        loadSprites();
     }
 
     public void draw(Graphics2D g2){
         g2.setColor(Color.BLACK);
 
         for (int i = 0; i < fence.length; i ++) {
-            g2.drawLine(fence[i].getStartX(), fence[i].getStartY(), fence[i].getEndX(), fence[i].getEndY());
-            if (i % 2 == 0) {
-                g2.setColor(Color.RED);
-            } else {
-                g2.setColor(Color.BLACK);
+            Segment segment = fence[i];
+            BufferedImage sprite = null;
+
+            int width = 24;
+            int height = 24;
+
+            if (segment.getStartX() == segment.getEndX()){
+                sprite = verticalSprite;
+            }else if (segment.getStartY() == segment.getEndY()){
+                sprite = horizontalSprite;
+            }else if (     segment.getStartX() < segment.getEndX()
+                        && segment.getStartY() < segment.getEndY()
+                        || segment.getStartX() > segment.getEndX()
+                        && segment.getStartY() > segment.getEndY()){
+                sprite = sDiagonalSprite;
+                height *= 2;
+            }else{
+                sprite = zDiagonalSprite;
+                height *= 2;
             }
-        }//g2.drawImage(sprite, x, y, 24, 24, null);
+
+            //g2.drawLine(fence[i].getStartX(), fence[i].getStartY(), fence[i].getEndX(), fence[i].getEndY());
+
+            g2.drawImage(sprite, segment.getStartX(), segment.getStartY(), width, height, null);
+        }//end of for loop.
+    }
+
+    public void loadSprites(){
+        if (verticalSprite == null || horizontalSprite == null || sDiagonalSprite == null || zDiagonalSprite == null) {
+            try {
+                verticalSprite   = ImageIO.read(getClass().getResourceAsStream("/static/sprites/fence/fence_vertical.png"));
+                horizontalSprite = ImageIO.read(getClass().getResourceAsStream("/static/sprites/fence/fence_horizontal.png"));
+                sDiagonalSprite  = ImageIO.read(getClass().getResourceAsStream("/static/sprites/fence/fence_diagonal_down.png"));
+                zDiagonalSprite  = ImageIO.read(getClass().getResourceAsStream("/static/sprites/fence/fence_diagonal_up.png"));
+
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
     }
 }
