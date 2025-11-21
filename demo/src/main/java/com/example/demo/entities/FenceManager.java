@@ -106,8 +106,6 @@ public class FenceManager {
 
 
             g2.drawImage(sprite, startX, startY, 24, height, null);
-            g2.drawLine(fence.getStartX(), fence.getStartY(), fence.getEndX(), fence.getEndY());
-
         }
 
     }
