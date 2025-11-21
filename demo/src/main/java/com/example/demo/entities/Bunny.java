@@ -20,6 +20,7 @@ public class Bunny extends Animal {
     static BufferedImage sprite;
 
     private boolean hasEaten = false;  // Boolean for eaten grass
+    private Bunny breedingPartner = null;  // Track who we're breeding with
 
     public Bunny(int x, int y){
         super(x, y, SPEED, VISION);
@@ -41,29 +42,98 @@ public class Bunny extends Animal {
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
         List<Grass> nearbyGrass = getGrassInVision(grid);
 
-        // 1. FLEE from wolves (highest priority!)
+        // 1. FLEE from wolves (HIGHEST priority!)
         if (!nearbyWolves.isEmpty()) {
             Vector2d fleeForce = flee(nearbyWolves);
-            fleeForce.mult(3.0);  // Strong weight
+            fleeForce.mult(4.0);  // Very strong - survival first!
             steering.add(fleeForce);
+            return steering;  // Ignore everything else when fleeing
         }
 
-        // 2. SEEK grass
-        if (!nearbyGrass.isEmpty()) {
-            Vector2d seekForce = seekGrass(nearbyGrass);
-            seekForce.mult(1.5);  // Medium-high weight
-            steering.add(seekForce);
-        }
+        // 2. BREEDING behavior (if has eaten)
+        if (hasEaten) {
+            // Look for another bunny that has also eaten
+            Bunny mate = findMate(nearbyBunnies);
 
-        // 3. COHESION with other bunnies (only if has eaten)
-        if (hasEaten && !nearbyBunnies.isEmpty()) {
-            Vector2d cohesionForce = cohesion(nearbyBunnies);
-            cohesionForce.mult(1.0);  // Medium weight
-            steering.add(cohesionForce);
+            if (mate != null) {
+                // Move toward mate for breeding
+                Vector2d breedingForce = seekMate(mate);
+                breedingForce.mult(3.0);  // High priority
+                steering.add(breedingForce);
+                breedingPartner = mate;  // Remember our partner
+            } else {
+                // No mate nearby, do cohesion with other fed bunnies
+                List<Bunny> fedBunnies = getFedBunnies(nearbyBunnies);
+                if (!fedBunnies.isEmpty()) {
+                    Vector2d cohesionForce = cohesion(fedBunnies);
+                    cohesionForce.mult(1.0);
+                    steering.add(cohesionForce);
+                }
+            }
+        } else {
+            // 3. SEEK grass (when hungry)
+            if (!nearbyGrass.isEmpty()) {
+                Vector2d seekForce = seekGrass(nearbyGrass);
+                seekForce.mult(2.0);  // Medium-high priority
+                steering.add(seekForce);
+            }
         }
 
         steering.limit(maxForce);
         return steering;
+    }
+
+    // Find a mate (another bunny that has eaten)
+    private Bunny findMate(List<Bunny> bunnies) {
+        for (Bunny other : bunnies) {
+            if (other != this && other.hasEaten() && other != breedingPartner) {
+                return other;
+            }
+        }
+        return null;
+    }
+
+    // Get list of fed bunnies for cohesion
+    private List<Bunny> getFedBunnies(List<Bunny> bunnies) {
+        List<Bunny> fed = new java.util.ArrayList<>();
+        for (Bunny bunny : bunnies) {
+            if (bunny.hasEaten()) {
+                fed.add(bunny);
+            }
+        }
+        return fed;
+    }
+
+    // Seek toward mate for breeding
+    private Vector2d seekMate(Bunny mate) {
+        Vector2d desired = new Vector2d(mate.getWorldX() - worldX,
+                mate.getWorldY() - worldY);
+        desired.normalize();
+        desired.mult(speed);
+
+        Vector2d steer = desired.copy();
+        steer.sub(currMovement);
+
+        return steer;
+    }
+
+    // Check if close enough to breed with another bunny
+    public boolean canBreedWith(Bunny other) {
+        if (!this.hasEaten || !other.hasEaten()) {
+            return false;
+        }
+
+        double dx = worldX - other.getWorldX();
+        double dy = worldY - other.getWorldY();
+        double dist = Math.sqrt(dx * dx + dy * dy);
+
+        return dist < 20;  // Must be within 20 pixels
+    }
+
+    // Reset after breeding
+    public void resetAfterBreeding() {
+        hasEaten = false;
+        breedingPartner = null;
     }
 
     // Flee: move AWAY from wolves
@@ -73,7 +143,7 @@ public class Bunny extends Animal {
         for (Wolf wolf : wolves) {
             double dx = worldX - wolf.getWorldX();
             double dy = worldY - wolf.getWorldY();
-            double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+            double dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist > 0 && dist < visionRadius) {
                 Vector2d away = new Vector2d(dx, dy);
@@ -86,7 +156,7 @@ public class Bunny extends Animal {
         if (fleeDir.magnitude() > 0) {
             fleeDir.normalize();
             fleeDir.mult(speed);
-            fleeDir.sub(currMovement); //subtract
+            fleeDir.sub(currMovement);
         }
 
         return fleeDir;
@@ -95,27 +165,28 @@ public class Bunny extends Animal {
     // Seek: move TOWARD grass
     private Vector2d seekGrass(List<Grass> grassList) {
         // Find closest grass
-        Grass nearestGrass = null;
-        double minDist = Double.MAX_VALUE; //highest possible double value. for finding smaller values.
+        Grass closest = null;
+        double minDist = Double.MAX_VALUE;
 
         for (Grass grass : grassList) {
             double dx = worldX - grass.getWorldX();
             double dy = worldY - grass.getWorldY();
-            double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+            double dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist < minDist) {
                 minDist = dist;
-                nearestGrass = grass;
+                closest = grass;
             }
-        }//end of for loop
+        }
 
-        if (nearestGrass == null) return new Vector2d(0, 0); //if no grass found.
+        if (closest == null) return new Vector2d(0, 0);
 
-        Vector2d idealPath = new Vector2d(nearestGrass.getWorldX() - worldX, nearestGrass.getWorldY() - worldY);
-        idealPath.normalize(); //find "step"
-        idealPath.mult(speed);
+        Vector2d desired = new Vector2d(closest.getWorldX() - worldX,
+                closest.getWorldY() - worldY);
+        desired.normalize();
+        desired.mult(speed);
 
-        Vector2d steer = idealPath.copy();
+        Vector2d steer = desired.copy();
         steer.sub(currMovement);
 
         return steer;
@@ -123,6 +194,8 @@ public class Bunny extends Animal {
 
     // Cohesion: move toward center of bunny group
     private Vector2d cohesion(List<Bunny> bunnies) {
+        if (bunnies.isEmpty()) return new Vector2d(0, 0);
+
         Vector2d center = new Vector2d(0, 0);
 
         for (Bunny bunny : bunnies) {
@@ -130,11 +203,11 @@ public class Bunny extends Animal {
         }
         center.div(bunnies.size());
 
-        Vector2d idealPath = new Vector2d(center.x - worldX, center.y - worldY);
-        idealPath.normalize();
-        idealPath.mult(speed);
+        Vector2d desired = new Vector2d(center.x - worldX, center.y - worldY);
+        desired.normalize();
+        desired.mult(speed);
 
-        Vector2d steer = idealPath.copy();
+        Vector2d steer = desired.copy();
         steer.sub(currMovement);
 
         return steer;
@@ -150,8 +223,8 @@ public class Bunny extends Animal {
 
     public void resetEaten() {
         hasEaten = false;
+        breedingPartner = null;
     }
-
     public void loadSprite(){
         if (sprite == null) {
             try {

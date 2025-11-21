@@ -163,6 +163,12 @@ public class GamePanel extends JPanel implements Runnable{
             totalWolfMetrics.add(wolf.metrics);
         }
 
+        // Check for bunny-grass collisions (eating)
+        handleBunnyEating();
+
+        // Check for bunny-bunny collisions (breeding)
+        handleBunnyBreeding();
+
         totalFrames++;
     }
     private void moveEntity(Animal animal) {
@@ -172,6 +178,84 @@ public class GamePanel extends JPanel implements Runnable{
       animal.update(grid);
       // Insert into new grid position
       grid.insert(animal, animal.getWorldX(), animal.getWorldY());
+    }
+
+    /**
+     * Check if bunnies can eat grass
+     * Remove grass when eaten and mark bunny as fed
+     */
+    private void handleBunnyEating() {
+        List<Grass> grassToRemove = new ArrayList<>();
+        List<Object> allEntities = grid.getAllEntities();
+
+        // Check each bunny against nearby grass
+        for (Bunny bunny : bunnies) {
+            if (bunny.hasEaten()) continue; // Skip if already eaten
+
+            // Find nearby grass
+            List<Object> nearby = grid.findNearby(bunny.getWorldX(), bunny.getWorldY());
+            for (Object obj : nearby) {
+                if (obj instanceof Grass) {
+                    Grass grass = (Grass) obj;
+
+                    // Check collision (close enough to eat)
+                    double dx = bunny.getWorldX() - grass.getWorldX();
+                    double dy = bunny.getWorldY() - grass.getWorldY();
+                    double distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 15) { // Eating range
+                        bunny.eatGrass();
+                        grassToRemove.add(grass);
+                        break; // One grass per frame
+                    }
+                }
+            }
+        }
+
+        // Remove eaten grass from grid
+        for (Grass grass : grassToRemove) {
+            grid.remove(grass, grass.getWorldX(), grass.getWorldY());
+        }
+    }
+
+    /**
+     * Check if two fed bunnies can breed
+     * Create a new bunny when conditions are met
+     */
+    private void handleBunnyBreeding() {
+        List<Bunny> newBunnies = new ArrayList<>();
+
+        // Check each pair of bunnies
+        for (int i = 0; i < bunnies.size(); i++) {
+            Bunny bunny1 = bunnies.get(i);
+            if (!bunny1.hasEaten()) continue;
+
+            for (int j = i + 1; j < bunnies.size(); j++) {
+                Bunny bunny2 = bunnies.get(j);
+
+                // Check if they can breed
+                if (bunny1.canBreedWith(bunny2)) {
+                    // Create baby bunny between the two parents
+                    int babyX = (bunny1.getWorldX() + bunny2.getWorldX()) / 2;
+                    int babyY = (bunny1.getWorldY() + bunny2.getWorldY()) / 2;
+
+                    Bunny baby = new Bunny(babyX, babyY);
+                    newBunnies.add(baby);
+
+                    // Reset parents after breeding
+                    bunny1.resetAfterBreeding();
+                    bunny2.resetAfterBreeding();
+
+                    break; // Each bunny can only breed once per cycle
+                }
+            }
+        }
+
+        // Add new bunnies to the game
+        for (Bunny baby : newBunnies) {
+            bunnies.add(baby);
+            grid.insert(baby, baby.getWorldX(), baby.getWorldY());
+        }
     }
 
 

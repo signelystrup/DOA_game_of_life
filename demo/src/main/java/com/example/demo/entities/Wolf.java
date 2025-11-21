@@ -13,6 +13,7 @@ public class Wolf extends Animal {
     static final double SPEED = 2.5;
     static final double VISION = 80.0;  // Wolves see farther than bunnies
     static BufferedImage sprite;
+    private boolean hasEaten = false;
 
     public Wolf(int x, int y){
         super(x, y, SPEED, VISION);
