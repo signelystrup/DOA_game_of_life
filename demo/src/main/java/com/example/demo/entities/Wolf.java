@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Wolf extends Animal {
     static final double SPEED = 2.5;
-    static final double VISION = 100.0;  // Wolves see a bit farther
+    static final double VISION = 80.0;  // Wolves see farther than bunnies
     static BufferedImage sprite;
 
     public Wolf(int x, int y){
