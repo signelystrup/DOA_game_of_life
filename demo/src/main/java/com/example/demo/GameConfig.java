@@ -9,7 +9,7 @@ public class GameConfig {
     // *** CHANGE THIS LINE TO SWITCH GRID STRATEGIES ***
     // we have 3 strategies, "SAFE_MAX_VISION" "OPTIMIZED_FOR_COMMON" "SMALL_CELLS"
     // Note: Non-final to allow runtime strategy changes (used by BenchmarkRunner)
-    public static GridStrategy STRATEGY = GridStrategy.OPTIMIZED_FOR_COMMON;
+    public static GridStrategy STRATEGY = GridStrategy.SAFE_MAX_VISION;
 
     // Vision ranges for each species (in pixels)
     public static final int RABBIT_VISION = 40;

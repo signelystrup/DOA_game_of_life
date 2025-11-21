@@ -10,12 +10,20 @@ public class BenchmarkRunner {
         // Set headless mode (no GUI needed for benchmarks)
         System.setProperty("java.awt.headless", "true");
 
+        // Benchmark configuration - change these values to test different scenarios
+        int bunnyCount = 5000;
+        int wolfCount = 1000;
+        int grassCount = 10;
+        int fenceCount = 2;
+        int durationSeconds = 60;
+
         System.out.println("╔════════════════════════════════════════════════════════════════╗");
         System.out.println("║          AUTOMATED BENCHMARK RUNNER                            ║");
         System.out.println("╚════════════════════════════════════════════════════════════════╝");
         System.out.println("\nRunning benchmarks for all 3 grid strategies...");
-        System.out.println("Duration: 60 seconds per strategy");
-        System.out.println("Entity counts: 5 bunnies, 1 wolf, 10 grass, 2 fences\n");
+        System.out.println("Duration: " + durationSeconds + " seconds per strategy");
+        System.out.println("Entity counts: " + bunnyCount + " bunnies, " + wolfCount +
+                           " wolves, " + grassCount + " grass, " + fenceCount + " fences\n");
 
         GridStrategy[] strategies = {
             GridStrategy.SAFE_MAX_VISION,
@@ -33,7 +41,7 @@ public class BenchmarkRunner {
             GameConfig.STRATEGY = strategy;
 
             // Run benchmark
-            runBenchmark(5, 1, 10, 2, 60);
+            runBenchmark(bunnyCount, wolfCount, grassCount, fenceCount, durationSeconds);
 
             // Wait between benchmarks (except after last one)
             if (i < strategies.length - 1) {
