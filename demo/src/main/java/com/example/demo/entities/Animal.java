@@ -115,19 +115,16 @@ public abstract class Animal {
         List<Fence> fenceList = new ArrayList<>();
 
         for (Object obj : nearby) {
-            if (obj instanceof FenceManager) {
-                FenceManager fenceManager = (FenceManager) obj;
-                Fence[] segments = fenceManager.getSegments();
+            if (obj instanceof Fence) {
+                Fence fence = (Fence) obj;
 
-                for (int i = 0 ; i < segments.length; i++) {
-                    int dx = worldX - segments[i].getStartX();
-                    int dy = worldY - segments[i].getStartY();
-                    double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+                int dx = worldX - fence.getStartX();
+                int dy = worldY - fence.getStartY();
+                double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
 
-                    if (dist <= visionRadius) {
-                        fenceList.add(segments[i]);
-                    }
-                }//inner loop
+                if (dist <= visionRadius) {
+                    fenceList.add(fence);
+                }
             }
         }//outer loop.
 

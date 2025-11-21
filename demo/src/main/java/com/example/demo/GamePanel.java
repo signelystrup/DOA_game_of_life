@@ -23,7 +23,8 @@ public class GamePanel extends JPanel implements Runnable{
     private GrassManager grassManager;
     private List<Bunny> bunnies = new ArrayList<>();
     private List<Wolf> wolves = new ArrayList<>();
-    private FenceManager[] fenceManagers = new FenceManager[0];
+    private List <FenceManager> fenceManagers = new ArrayList<>();
+
     private Random random = new Random();
 
     public GamePanel(){
@@ -41,15 +42,15 @@ public class GamePanel extends JPanel implements Runnable{
         grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.GRID_CELL_SIZE);
         grassManager = new GrassManager(grid);
 
-        //fences: create random fences with random lengths
-        fenceManagers = new FenceManager[fenceCount];
+        //fences: create random fences with random lengths;
         for (int i = 0; i < fenceCount; i++) {
             int randomLength = random.nextInt(5, 15);  // Random length between 5-14 segments
-            fenceManagers[i] = new FenceManager(randomLength);
+            fenceManagers.add (new FenceManager(randomLength));
 
             for (int j = 0; j < randomLength; j++){
-                Fence segment = fenceManagers[i].getSegments()[j];
+                Fence segment = fenceManagers.get(i).getSegments()[j];
                 grid.insert(segment, segment.getStartX(), segment.getStartY());
+                System.out.println("added fence to grid"); //debug. remove
             }//inner loop
         }//outer loop.
 
@@ -148,10 +149,8 @@ public class GamePanel extends JPanel implements Runnable{
         drawBackground(g2);
 
         //fences: draw first (foreground layer)
-        for(int i = 0; i < fenceManagers.length; i ++){
-            if (fenceManagers[i] != null){
-                fenceManagers[i].draw(g2);
-            }
+        for(int i = 0; i < fenceManagers.size(); i ++){
+            fenceManagers.get(i).draw(g2);
         }
 
         // Draw all entities from grid (only if grid is initialized)
@@ -242,12 +241,12 @@ public class GamePanel extends JPanel implements Runnable{
     public void addFence() {
         int randomLength = random.nextInt(5, 15);
         FenceManager newFenceManager = new FenceManager(randomLength);
+        fenceManagers.add(newFenceManager);
 
-        // Expand fences array
-        FenceManager[] newFenceManagers = new FenceManager[fenceManagers.length + 1];
-        System.arraycopy(fenceManagers, 0, newFenceManagers, 0, fenceManagers.length);
-        newFenceManagers[fenceManagers.length] = newFenceManager;
-        fenceManagers = newFenceManagers;
+        for (int i = 0; i < randomLength; i++){
+            Fence segment = fenceManagers.get(i).getSegments()[i];
+            grid.insert(segment, segment.getStartX(), segment.getStartY());
+        }//inner loop
     }
 
     /**
