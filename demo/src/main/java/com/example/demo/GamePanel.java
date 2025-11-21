@@ -492,7 +492,12 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void drawBackground(Graphics2D g2){
-        g2.drawImage(backgroundSprite, 0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, null);
+        int ratio = backgroundSprite.getWidth() / backgroundSprite.getHeight(); //keep aspect ratio.
+        int height = GameConfig.WORLD_HEIGHT ;
+        int width = GameConfig.WORLD_WIDTH * ratio;
+
+
+        g2.drawImage(backgroundSprite, 0, 0, width, height , null);
     }
 
     public void loadSprite(){
