@@ -127,29 +127,19 @@ public class GamePanel extends JPanel implements Runnable{
             grassManager.update();
         }
 
-        // Reset per-frame metrics
-        for (Bunny bunny : bunnies) {
-            bunny.metrics.reset();
-        }
-        for (Wolf wolf : wolves) {
-            wolf.metrics.reset();
-        }
-
-        // Update all bunnies
+        // Update all bunnies: reset, move, accumulate (safe index-based loop)
         for(int i = 0; i < bunnies.size(); i++){
-            moveEntity(bunnies.get(i));
-        }
-
-        // Update all wolves
-        for(int i = 0; i < wolves.size(); i++) {
-            moveEntity(wolves.get(i));
-        }
-
-        // Accumulate metrics from this frame
-        for (Bunny bunny : bunnies) {
+            Bunny bunny = bunnies.get(i);
+            bunny.metrics.reset();
+            moveEntity(bunny);
             totalBunnyMetrics.add(bunny.metrics);
         }
-        for (Wolf wolf : wolves) {
+
+        // Update all wolves: reset, move, accumulate (safe index-based loop)
+        for(int i = 0; i < wolves.size(); i++) {
+            Wolf wolf = wolves.get(i);
+            wolf.metrics.reset();
+            moveEntity(wolf);
             totalWolfMetrics.add(wolf.metrics);
         }
 
