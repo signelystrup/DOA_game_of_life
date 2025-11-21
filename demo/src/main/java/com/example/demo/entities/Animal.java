@@ -9,8 +9,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Math.sqrt;
-
 @Getter
 @Setter
 public abstract class Animal {
@@ -131,4 +129,53 @@ public abstract class Animal {
         }
         return filtered;
     }
+
+    protected List<Fence> getFencesInVision(Grid grid){
+        List<Object> nearby = grid.findNearby(worldX, worldY);
+        List<Fence> fenceList = new ArrayList<>();
+
+        for (Object obj : nearby) {
+            if (obj instanceof Fence) {
+                Fence fence = (Fence) obj;
+
+                int dx = worldX - fence.getStartX();
+                int dy = worldY - fence.getStartY();
+                double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+
+                if (dist <= visionRadius) {
+                    fenceList.add(fence);
+                }
+            }
+        }//outer loop.
+
+        return fenceList;
+    }
+
+    protected Vector2d getFenceForce(List <Fence> nearbyFences){
+        double dist = Double.MAX_VALUE;
+        Fence fence = null;
+
+        //find closest fence.
+        for (int i = 0; i < nearbyFences.size(); i ++){
+            double dx = worldX - nearbyFences.get(i).getStartX();
+            double dy = worldY - nearbyFences.get(i).getStartY();
+            double currentDist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+
+            if (currentDist < dist ) {
+                fence = nearbyFences.get(i);
+                dist = currentDist;
+            }
+        }
+
+        //find force:
+        double dx = worldX - fence.getStartX();
+        double dy = worldY - fence.getStartY();
+        Vector2d force = new Vector2d(dx, dy);
+
+        force.setMagnitude(speed); //set length.
+        force.sub(currMovement);
+
+        return force;
+    }
+
 }
