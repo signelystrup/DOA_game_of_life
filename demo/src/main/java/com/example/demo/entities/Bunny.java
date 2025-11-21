@@ -64,7 +64,6 @@ public class Bunny extends Animal {
 
         // 4. avoid nearby fences:
         if (!nearbyFences.isEmpty()){
-            System.out.println("fences nearby"); //debug. remove.
             Vector2d fenceForce = getFenceForce(nearbyFences);
             fenceForce.mult(5.0);  // change
             steering.add(fenceForce);
