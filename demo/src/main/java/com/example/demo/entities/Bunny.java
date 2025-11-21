@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 public class Bunny extends Animal {
     static final double SPEED = 2.0;
-    static final double VISION = 80.0;  // Vision radius in pixels
+    static final double VISION = 40.0;  // Vision radius in pixels
     static BufferedImage sprite;
 
     private boolean hasEaten = false;  // Boolean for eaten grass

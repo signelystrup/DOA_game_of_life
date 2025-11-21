@@ -2,6 +2,7 @@ package com.example.demo.entities;
 
 import com.example.demo.GameConfig;
 import com.example.demo.Grid;
+import com.example.demo.VisionMetrics;
 import lombok.Getter;
 import lombok.Setter;
 import java.awt.*;
@@ -20,6 +21,9 @@ public abstract class Animal {
     protected double maxForce = 0.3; //how fast an animal can turn
 
     protected int destX, destY;
+
+    // Performance metrics tracking
+    public VisionMetrics metrics = new VisionMetrics();
 
     public Animal(int worldX, int worldY, double speed, double visionRadius){
         this.worldX = worldX;
@@ -59,23 +63,39 @@ public abstract class Animal {
 
     protected abstract Vector2d calculateSteeringForce(Grid grid);
 
-    // Helper: Get animals in vision from grid
+    // Helper: Get animals in vision from grid (with metrics tracking)
     protected List<Animal> getAnimalsInVision(Grid grid) {
-        List<Object> nearby = grid.findNearby(worldX, worldY);
+        // Get search radius for this animal type
+        int searchRadius = GameConfig.getSearchRadius(this.getClass());
+
+        List<Object> nearby = grid.findNearby(worldX, worldY, searchRadius);
         List<Animal> animals = new ArrayList<>();
+
+        // Track how many animals we fetched vs how many are in vision
+        int fetchedCount = 0;
+        int inVisionCount = 0;
 
         for (Object obj : nearby) {
             if (obj instanceof Animal) {
+                fetchedCount++;
                 Animal other = (Animal) obj;
                 if (other != this) {
-                    double dist = Math.sqrt((worldX - other.worldX) * (worldX - other.worldX) + 
+                    double dist = Math.sqrt((worldX - other.worldX) * (worldX - other.worldX) +
                                           (worldY - other.worldY) * (worldY - other.worldY));
+
+                    metrics.recordCheck(); // Track distance calculation
+
                     if (dist <= visionRadius) {
                         animals.add(other);
+                        inVisionCount++;
                     }
                 }
             }
         }
+
+        // Record metrics for this search
+        metrics.recordFetch(fetchedCount);
+        metrics.recordInVision(inVisionCount);
 
         return animals;
     }

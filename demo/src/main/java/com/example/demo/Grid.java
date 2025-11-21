@@ -54,19 +54,23 @@ public class Grid {
     }
 
     /**
-     * Find all entities in nearby cells (3x3 grid around position)
+     * Find all entities in nearby cells with configurable radius
      * Note: Returns all entities from cells, not filtered by distance
      *
+     * @param worldX X position in world coordinates
+     * @param worldY Y position in world coordinates
+     * @param cellRadius How many cells away to search (1 = 3×3, 2 = 5×5, etc.)
      * @return List of entities from nearby cells
      */
-    public List<Object> findNearby(float worldX, float worldY) {
+    public List<Object> findNearby(float worldX, float worldY, int cellRadius) {
         List<Object> nearby = new ArrayList<>();
 
         int centerX = worldToGridX(worldX);
         int centerY = worldToGridY(worldY);
 
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
+        // Search from -cellRadius to +cellRadius in both dimensions
+        for (int dx = -cellRadius; dx <= cellRadius; dx++) {
+            for (int dy = -cellRadius; dy <= cellRadius; dy++) {
                 int checkX = centerX + dx;
                 int checkY = centerY + dy;
 
@@ -78,6 +82,16 @@ public class Grid {
         }
 
         return nearby;
+    }
+
+    /**
+     * Find all entities in nearby cells (3x3 grid around position)
+     * Convenience method that uses radius 1
+     *
+     * @return List of entities from nearby cells
+     */
+    public List<Object> findNearby(float worldX, float worldY) {
+        return findNearby(worldX, worldY, 1);
     }
 
     /**
