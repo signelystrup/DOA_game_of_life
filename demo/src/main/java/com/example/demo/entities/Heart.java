@@ -16,8 +16,6 @@ public class Heart {
         this.worldX = worldX;
         this.worldY = worldY;
         loadSprite();
-
-        System.out.println("heart");
     }
 
     public void draw(Graphics2D g2) {
