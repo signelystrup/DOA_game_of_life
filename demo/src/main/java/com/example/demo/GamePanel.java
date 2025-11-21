@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import com.example.demo.entities.*;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +27,7 @@ public class GamePanel extends JPanel implements Runnable{
     private List<Wolf> wolves = new ArrayList<>();
     private List <FenceManager> fenceManagers = new ArrayList<>();
 
+    private List<Heart> hearts = new ArrayList<>();
     private Random random = new Random();
 
     // Performance metrics tracking - accumulate over entire game session
@@ -54,7 +54,7 @@ public class GamePanel extends JPanel implements Runnable{
         //fences: create random fences with random lengths;
         for (int i = 0; i < fenceCount; i++) {
             int randomLength = random.nextInt(5, 15);  // Random length between 5-14 segments
-            fenceManagers.add (new FenceManager(randomLength));
+            fenceManagers.add(new FenceManager(randomLength));
 
             for (int j = 0; j < randomLength; j++){
                 Fence segment = fenceManagers.get(i).getSegments()[j];
@@ -241,6 +241,9 @@ public class GamePanel extends JPanel implements Runnable{
                     Bunny baby = new Bunny(babyX, babyY);
                     newBunnies.add(baby);
 
+                    Heart heart = new Heart (babyX, babyY); //display heart.
+                    hearts.add(heart);
+
                     // Reset parents after breeding
                     bunny1.resetAfterBreeding();
                     bunny2.resetAfterBreeding();
@@ -279,6 +282,7 @@ public class GamePanel extends JPanel implements Runnable{
 
         List<Object> allEntities = grid.getAllEntities();
 
+        //grass, wolves, bunnies
         for (int i = 0; i < allEntities.size(); i++) {
             Object obj = allEntities.get(i);
             if (obj instanceof Grass) {
@@ -287,6 +291,15 @@ public class GamePanel extends JPanel implements Runnable{
                 ((Bunny)obj).draw(g2);
             } else if (obj instanceof Wolf) {
                 ((Wolf)obj).draw(g2);
+            }
+        }
+
+        //draw hearts
+        for (int i = hearts.size() -1 ; i >= 0 ; i --){
+            if (hearts.get(i).getHeartTimer() == 0){
+                hearts.remove(i);
+            }else {
+                hearts.get(i).draw(g2);
             }
         }
 

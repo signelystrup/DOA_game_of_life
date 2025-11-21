@@ -9,9 +9,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Random;
 
+@Getter
 public class FenceManager {
     private static BufferedImage verticalSprite, horizontalSprite, zDiagonalSprite, sDiagonalSprite;
-    @Getter private Fence[] segments;
+     private Fence[] segments;
 
     public FenceManager(int length){
         segments = new Fence[length];
