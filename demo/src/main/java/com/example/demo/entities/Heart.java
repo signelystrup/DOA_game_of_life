@@ -24,7 +24,6 @@ public class Heart {
         if (heartTimer > 0) {
             g2.drawImage(sprite, worldX, worldY, 24, 24, null);
             heartTimer--;
-            System.out.println("draw heart");
         }
     }
 
