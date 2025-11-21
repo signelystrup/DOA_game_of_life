@@ -161,7 +161,6 @@ public abstract class Animal {
             double dy = worldY - nearbyFences.get(i).getStartY();
             double currentDist = Math.sqrt(dx * dx + dy * dy); //pythagoras
 
-
             if (currentDist < dist ) {
                 fence = nearbyFences.get(i);
                 dist = currentDist;

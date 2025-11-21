@@ -327,8 +327,8 @@ public class GamePanel extends JPanel implements Runnable{
         double durationSeconds = duration / 1000.0;
 
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║          FINAL VISION PERFORMANCE METRICS                      ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        System.out.println(  "║          FINAL VISION PERFORMANCE METRICS                      ║");
+        System.out.println(  "╚════════════════════════════════════════════════════════════════╝");
         System.out.println("\nStrategy: " + GameConfig.STRATEGY);
         System.out.println("Description: " + GameConfig.getStrategyDescription());
         System.out.println("Cell Size: " + GameConfig.getGridCellSize() + "px");
