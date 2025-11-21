@@ -59,7 +59,6 @@ public class GamePanel extends JPanel implements Runnable{
             for (int j = 0; j < randomLength; j++){
                 Fence segment = fenceManagers.get(i).getSegments()[j];
                 grid.insert(segment, segment.getStartX(), segment.getStartY());
-                System.out.println("added fence to grid"); //debug. remove
             }//inner loop
         }//outer loop.
 
@@ -279,9 +278,10 @@ public class GamePanel extends JPanel implements Runnable{
         fenceManagers.add(newFenceManager);
 
         for (int i = 0; i < randomLength; i++){
-            Fence segment = fenceManagers.get(i).getSegments()[i];
+            Fence segment = fenceManagers.get(fenceManagers.size() - 1).getSegments()[i];
             grid.insert(segment, segment.getStartX(), segment.getStartY());
-        }//inner loop
+        }
+
     }
 
     /**

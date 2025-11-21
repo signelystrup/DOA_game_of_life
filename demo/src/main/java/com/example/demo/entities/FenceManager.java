@@ -38,6 +38,7 @@ public class FenceManager {
     public void draw(Graphics2D g2){
         g2.setColor(Color.BLACK);
 
+        /*
         for (int i = 0; i < segments.length; i ++) {
             Fence segment = segments[i];
             BufferedImage sprite;
@@ -70,6 +71,16 @@ public class FenceManager {
 
             g2.drawImage(sprite, x, y, width, height, null);
         }//end of for loop.
+
+
+         */
+        g2.setColor(Color.WHITE);
+        for (int i = 0; i < segments.length; i ++) {
+            Fence fence = segments[i];
+
+            g2.drawLine(fence.getStartX(), fence.getStartY(), fence.getEndX(), fence.getEndY());
+        }
+
     }
 
     public void loadSprites(){
