@@ -31,12 +31,20 @@ public class Wolf extends Animal {
         // Get nearby animals from grid
         List<Animal> nearbyAnimals = getAnimalsInVision(grid);
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
+        List <Fence> nearbyFences = getFencesInVision(grid);
 
         // SEEK bunnies (hunt them!)
         if (!nearbyBunnies.isEmpty()) {
             Vector2d seekForce = seekBunny(nearbyBunnies);
             seekForce.mult(2.0);  // Strong hunting instinct
             steering.add(seekForce);
+        }
+
+        // 4. avoid nearby fences:
+        if (!nearbyFences.isEmpty()){
+            Vector2d fenceForce = getFenceForce(nearbyFences);
+            fenceForce.mult(3.0);  //idk.
+            steering.add(fenceForce);
         }
 
         steering.limit(maxForce);
