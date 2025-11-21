@@ -10,7 +10,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -48,7 +51,7 @@ public class GamePanel extends JPanel implements Runnable{
     public void setUpGame(int bunnyCount, int wolfCount, int grassCount, int fenceCount){
         //init grid and entities here.
         // Cell size = max(vision ranges) to ensure findNearby() works for all species
-        grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.GRID_CELL_SIZE);
+        grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.getGridCellSize());
         grassManager = new GrassManager(grid);
 
         //fences: create random fences with random lengths
@@ -95,6 +98,23 @@ public class GamePanel extends JPanel implements Runnable{
         totalBunnyMetrics.reset();
         totalWolfMetrics.reset();
         System.out.println("game start");
+    }
+
+    /**
+     * Stop the game thread gracefully
+     */
+    public void stopGameThread() {
+        Thread threadToStop = gameThread;
+        gameThread = null;  // This will cause run() loop to exit
+
+        // Wait for thread to finish
+        if (threadToStop != null) {
+            try {
+                threadToStop.join(1000);  // Wait up to 1 second
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @Override
@@ -313,7 +333,7 @@ public class GamePanel extends JPanel implements Runnable{
         System.out.println("╚════════════════════════════════════════════════════════════════╝");
         System.out.println("\nStrategy: " + GameConfig.STRATEGY);
         System.out.println("Description: " + GameConfig.getStrategyDescription());
-        System.out.println("Cell Size: " + GameConfig.GRID_CELL_SIZE + "px");
+        System.out.println("Cell Size: " + GameConfig.getGridCellSize() + "px");
         System.out.println("\nSession Duration: " + String.format("%.1f", durationSeconds) + " seconds");
         System.out.println("Total Frames: " + totalFrames);
         System.out.println("Average FPS: " + String.format("%.1f", totalFrames / durationSeconds));
@@ -339,6 +359,54 @@ public class GamePanel extends JPanel implements Runnable{
                 totalWolfMetrics.getWastedEntities() / (double)totalFrames));
 
         System.out.println("\n═════════════════════════════════════════════════════════════════\n");
+    }
+
+    /**
+     * Save benchmark results to CSV file
+     * Appends to existing file or creates new one with headers
+     */
+    public void saveResultsToCSV() {
+        String filename = "benchmark_results.csv";
+        File file = new File(filename);
+        boolean fileExists = file.exists();
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file, true))) {
+            // Write headers if file is new
+            if (!fileExists) {
+                writer.println("Strategy,Cell_Size,Duration_Sec,Total_Frames,Avg_FPS," +
+                        "Bunny_Count,Bunny_Fetched,Bunny_InVision,Bunny_Wasted,Bunny_Efficiency,Bunny_Checks," +
+                        "Wolf_Count,Wolf_Fetched,Wolf_InVision,Wolf_Wasted,Wolf_Efficiency,Wolf_Checks");
+            }
+
+            // Calculate values
+            long duration = System.currentTimeMillis() - gameStartTime;
+            double durationSeconds = duration / 1000.0;
+            double avgFPS = totalFrames / durationSeconds;
+
+            // Write data row
+            writer.printf("%s,%d,%.1f,%d,%.1f,%d,%d,%d,%d,%.1f,%d,%d,%d,%d,%d,%.1f,%d%n",
+                    GameConfig.STRATEGY,
+                    GameConfig.getGridCellSize(),
+                    durationSeconds,
+                    totalFrames,
+                    avgFPS,
+                    bunnies.size(),
+                    totalBunnyMetrics.getEntitiesFetched(),
+                    totalBunnyMetrics.getEntitiesInVision(),
+                    totalBunnyMetrics.getWastedEntities(),
+                    totalBunnyMetrics.getEfficiencyPercent(),
+                    totalBunnyMetrics.getVisionChecks(),
+                    wolves.size(),
+                    totalWolfMetrics.getEntitiesFetched(),
+                    totalWolfMetrics.getEntitiesInVision(),
+                    totalWolfMetrics.getWastedEntities(),
+                    totalWolfMetrics.getEfficiencyPercent(),
+                    totalWolfMetrics.getVisionChecks());
+
+            System.out.println("✓ Results saved to " + filename);
+        } catch (IOException e) {
+            System.err.println("✗ Error saving to CSV: " + e.getMessage());
+        }
     }
 
     public void drawBackground(Graphics2D g2){

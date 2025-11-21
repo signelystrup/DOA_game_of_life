@@ -8,7 +8,8 @@ package com.example.demo;
 public class GameConfig {
     // *** CHANGE THIS LINE TO SWITCH GRID STRATEGIES ***
     // we have 3 strategies, "SAFE_MAX_VISION" "OPTIMIZED_FOR_COMMON" "SMALL_CELLS"
-    public static final GridStrategy STRATEGY = GridStrategy.OPTIMIZED_FOR_COMMON;
+    // Note: Non-final to allow runtime strategy changes (used by BenchmarkRunner)
+    public static GridStrategy STRATEGY = GridStrategy.OPTIMIZED_FOR_COMMON;
 
     // Vision ranges for each species (in pixels)
     public static final int RABBIT_VISION = 40;
@@ -17,8 +18,11 @@ public class GameConfig {
     /**
      * Grid cell size determined by selected strategy
      * Different strategies optimize for different scenarios
+     * Calculated dynamically to support runtime strategy changes
      */
-    public static final int GRID_CELL_SIZE = STRATEGY.getCellSize();
+    public static int getGridCellSize() {
+        return STRATEGY.getCellSize();
+    }
 
     // World dimensions
     public static final int WORLD_WIDTH = 1300;
