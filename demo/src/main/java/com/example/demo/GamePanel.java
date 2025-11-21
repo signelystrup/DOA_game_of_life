@@ -1,10 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.entities.Bunny;
-import com.example.demo.entities.Fence;
-import com.example.demo.entities.Grass;
-import com.example.demo.entities.Wolf;
-import com.example.demo.entities.Animal;
+import com.example.demo.entities.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -50,10 +46,14 @@ public class GamePanel extends JPanel implements Runnable{
         for (int i = 0; i < fenceCount; i++) {
             int randomLength = random.nextInt(5, 15);  // Random length between 5-14 segments
             fences[i] = new Fence(randomLength);
-        }
+
+            for (int j = 0; j < randomLength; j++){
+                FenceSegment segment = fences[i].getSegments()[j];
+                grid.insert(segment, segment.getStartX(), segment.getStartY());
+            }//inner loop
+        }//outer loop.
 
         //bunnies: random placement
-        //bunnies = new Bunny[bunnyCount];
         for (int i = 0 ; i < bunnyCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
@@ -63,7 +63,6 @@ public class GamePanel extends JPanel implements Runnable{
         }
 
         //wolves: random placement
-        //wolves = new Wolf[wolfCount];
         for (int i = 0 ; i < wolfCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);

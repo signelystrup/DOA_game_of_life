@@ -111,4 +111,28 @@ public abstract class Animal {
         }
         return filtered;
     }
+
+    protected List<FenceSegment> getFencesInVision(Grid grid){
+        List<Object> nearby = grid.findNearby(worldX, worldY);
+        List<FenceSegment> fenceSegmentList = new ArrayList<>();
+
+        for (Object obj : nearby) {
+            if (obj instanceof Fence) {
+                Fence fence = (Fence) obj;
+                FenceSegment[] segments = fence.getSegments();
+
+                for (int i = 0 ; i < segments.length; i++) {
+                    int dx = worldX - segments[i].getStartX();
+                    int dy = worldY - segments[i].getStartY();
+                    double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+
+                    if (dist <= visionRadius) {
+                        fenceSegmentList.add(segments[i]);
+                    }
+                }//inner loop
+            }
+        }//outer loop.
+
+        return fenceSegmentList;
+    }
 }

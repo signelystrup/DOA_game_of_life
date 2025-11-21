@@ -40,7 +40,7 @@ public class Bunny extends Animal {
         List<Wolf> nearbyWolves = filterByType(nearbyAnimals, Wolf.class);
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
         List<Grass> nearbyGrass = getGrassInVision(grid);
-
+        List <FenceSegment> nearbyFences = getFencesInVision(grid);
         // 1. FLEE from wolves (highest priority!)
         if (!nearbyWolves.isEmpty()) {
             Vector2d fleeForce = flee(nearbyWolves);
@@ -61,6 +61,9 @@ public class Bunny extends Animal {
             cohesionForce.mult(1.0);  // Medium weight
             steering.add(cohesionForce);
         }
+
+        // 4. avoid nearby fences:
+        //if ()
 
         steering.limit(maxForce);
         return steering;
