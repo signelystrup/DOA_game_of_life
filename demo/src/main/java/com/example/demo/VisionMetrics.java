@@ -7,7 +7,6 @@ package com.example.demo;
 public class VisionMetrics {
     private int entitiesFetched = 0;    // Total entities retrieved from grid
     private int entitiesInVision = 0;   // Entities actually within vision range
-    private int visionChecks = 0;       // Number of distance calculations performed
 
     /**
      * Record entities fetched from grid
@@ -21,13 +20,6 @@ public class VisionMetrics {
      */
     public void recordInVision(int count) {
         entitiesInVision += count;
-    }
-
-    /**
-     * Record a distance check calculation
-     */
-    public void recordCheck() {
-        visionChecks++;
     }
 
     /**
@@ -60,19 +52,11 @@ public class VisionMetrics {
     }
 
     /**
-     * Get number of vision checks
-     */
-    public int getVisionChecks() {
-        return visionChecks;
-    }
-
-    /**
      * Reset all counters (call at start of each frame)
      */
     public void reset() {
         entitiesFetched = 0;
         entitiesInVision = 0;
-        visionChecks = 0;
     }
 
     /**
@@ -81,7 +65,6 @@ public class VisionMetrics {
     public void add(VisionMetrics other) {
         this.entitiesFetched += other.entitiesFetched;
         this.entitiesInVision += other.entitiesInVision;
-        this.visionChecks += other.visionChecks;
     }
 
     @Override

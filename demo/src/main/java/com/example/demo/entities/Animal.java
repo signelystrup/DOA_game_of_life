@@ -85,8 +85,6 @@ public abstract class Animal {
                     double dist = Math.sqrt((worldX - other.worldX) * (worldX - other.worldX) +
                                           (worldY - other.worldY) * (worldY - other.worldY));
 
-                    metrics.recordCheck(); // Track distance calculation
-
                     if (dist <= visionRadius) {
                         animals.add(other);
                         inVisionCount++;

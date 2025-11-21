@@ -26,9 +26,9 @@ public class BenchmarkRunner {
                            " wolves, " + grassCount + " grass, " + fenceCount + " fences\n");
 
         GridStrategy[] strategies = {
-            GridStrategy.SAFE_MAX_VISION,
-            GridStrategy.OPTIMIZED_FOR_COMMON,
-            GridStrategy.SMALL_CELLS
+            GridStrategy.OPTIMIZED_FOR_WOLVES,
+            GridStrategy.OPTIMIZED_FOR_BUNNIES,
+            GridStrategy.OPTIMIZED_FOR_EFFICIENCY
         };
 
         for (int i = 0; i < strategies.length; i++) {

@@ -374,8 +374,8 @@ public class GamePanel extends JPanel implements Runnable{
             // Write headers if file is new
             if (!fileExists) {
                 writer.println("Strategy,Cell_Size,Duration_Sec,Total_Frames,Avg_FPS," +
-                        "Bunny_Count,Bunny_Fetched,Bunny_InVision,Bunny_Wasted,Bunny_Efficiency,Bunny_Checks," +
-                        "Wolf_Count,Wolf_Fetched,Wolf_InVision,Wolf_Wasted,Wolf_Efficiency,Wolf_Checks");
+                        "Bunny_Count,Total_Bunnies_Fetched,Total_Bunnies_In_Vision,Total_Bunnies_Wasted,Bunny_Efficiency," +
+                        "Wolf_Count,Total_Wolves_Fetched,Total_Wolves_In_Vision,Total_Wolves_Wasted,Wolf_Efficiency");
             }
 
             // Calculate values
@@ -384,7 +384,7 @@ public class GamePanel extends JPanel implements Runnable{
             double avgFPS = totalFrames / durationSeconds;
 
             // Write data row
-            writer.printf("%s,%d,%.1f,%d,%.1f,%d,%d,%d,%d,%.1f,%d,%d,%d,%d,%d,%.1f,%d%n",
+            writer.printf("%s,%d,%.1f,%d,%.1f,%d,%d,%d,%d,%.1f,%d,%d,%d,%d,%.1f%n",
                     GameConfig.STRATEGY,
                     GameConfig.getGridCellSize(),
                     durationSeconds,
@@ -395,13 +395,11 @@ public class GamePanel extends JPanel implements Runnable{
                     totalBunnyMetrics.getEntitiesInVision(),
                     totalBunnyMetrics.getWastedEntities(),
                     totalBunnyMetrics.getEfficiencyPercent(),
-                    totalBunnyMetrics.getVisionChecks(),
                     wolves.size(),
                     totalWolfMetrics.getEntitiesFetched(),
                     totalWolfMetrics.getEntitiesInVision(),
                     totalWolfMetrics.getWastedEntities(),
-                    totalWolfMetrics.getEfficiencyPercent(),
-                    totalWolfMetrics.getVisionChecks());
+                    totalWolfMetrics.getEfficiencyPercent());
 
             System.out.println("✓ Results saved to " + filename);
         } catch (IOException e) {
