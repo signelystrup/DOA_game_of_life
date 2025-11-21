@@ -39,6 +39,8 @@ public class Fence {
         } catch (ArithmeticException e) {//divide by 0. If line is horizontal.
             endY = startY + dy * direction; //only y can change.
         }
+
+        calculateCurrentSlope();
     }
 
     public void calculateEndPoint(int dx, int direction){
@@ -64,6 +66,15 @@ public class Fence {
             default:
                 break;
         }//eo switch.
+    }
+
+    public void calculateCurrentSlope(){
+        try {
+            a = (startX - endX) / ( startY - endY);
+        }catch(ArithmeticException e){
+            a = 2;
+        }
+
     }
 
 }

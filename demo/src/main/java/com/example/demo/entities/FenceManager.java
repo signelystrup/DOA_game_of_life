@@ -74,11 +74,40 @@ public class FenceManager {
 
 
          */
+
+        BufferedImage sprite;
+
+
         g2.setColor(Color.WHITE);
+
         for (int i = 0; i < segments.length; i ++) {
             Fence fence = segments[i];
 
+            int height = 24;
+            int startY = Math.min(fence.getStartY(), fence.getEndY()) - height;
+            int startX = Math.min(fence.getStartX(), fence.getEndX());
+
+
+            if (fence.getA() == 0){
+                sprite = verticalSprite;
+                startX -= 18;
+                height *= 2;
+
+            }else if (fence.getA() == -1){
+                sprite = zDiagonalSprite;
+                height *= 2;
+            }else if (fence.getA() == 1){
+                sprite = sDiagonalSprite;
+                height *= 2;
+            }else{
+                sprite = horizontalSprite;
+            }
+
+
+
+            g2.drawImage(sprite, startX, startY, 24, height, null);
             g2.drawLine(fence.getStartX(), fence.getStartY(), fence.getEndX(), fence.getEndY());
+
         }
 
     }
