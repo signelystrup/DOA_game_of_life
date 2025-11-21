@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import com.example.demo.entities.*;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +25,8 @@ public class GamePanel extends JPanel implements Runnable{
     private GrassManager grassManager;
     private List<Bunny> bunnies = new ArrayList<>();
     private List<Wolf> wolves = new ArrayList<>();
-    private Fence[] fences = new Fence[0];
+    private List <FenceManager> fenceManagers = new ArrayList<>();
+
     private List<Heart> hearts = new ArrayList<>();
     private Random random = new Random();
 
@@ -51,15 +51,18 @@ public class GamePanel extends JPanel implements Runnable{
         grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.getGridCellSize());
         grassManager = new GrassManager(grid);
 
-        //fences: create random fences with random lengths
-        fences = new Fence[fenceCount];
+        //fences: create random fences with random lengths;
         for (int i = 0; i < fenceCount; i++) {
             int randomLength = random.nextInt(5, 15);  // Random length between 5-14 segments
-            fences[i] = new Fence(randomLength);
-        }
+            fenceManagers.add(new FenceManager(randomLength));
+
+            for (int j = 0; j < randomLength; j++){
+                Fence segment = fenceManagers.get(i).getSegments()[j];
+                grid.insert(segment, segment.getStartX(), segment.getStartY());
+            }//inner loop
+        }//outer loop.
 
         //bunnies: random placement
-        //bunnies = new Bunny[bunnyCount];
         for (int i = 0 ; i < bunnyCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
@@ -69,7 +72,6 @@ public class GamePanel extends JPanel implements Runnable{
         }
 
         //wolves: random placement
-        //wolves = new Wolf[wolfCount];
         for (int i = 0 ; i < wolfCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
@@ -267,11 +269,9 @@ public class GamePanel extends JPanel implements Runnable{
         //background
         drawBackground(g2);
 
-        //fences: draw first (foreground layer) (??background, no?)
-        for(int i = 0; i < fences.length; i ++){
-            if (fences[i] != null){
-                fences[i].draw(g2);
-            }
+        //fences: draw first (foreground layer)
+        for(int i = 0; i < fenceManagers.size(); i ++){
+            fenceManagers.get(i).draw(g2);
         }
 
         // Draw all entities from grid (only if grid is initialized)
@@ -371,13 +371,14 @@ public class GamePanel extends JPanel implements Runnable{
      */
     public void addFence() {
         int randomLength = random.nextInt(5, 15);
-        Fence newFence = new Fence(randomLength);
+        FenceManager newFenceManager = new FenceManager(randomLength);
+        fenceManagers.add(newFenceManager);
 
-        // Expand fences array
-        Fence[] newFences = new Fence[fences.length + 1];
-        System.arraycopy(fences, 0, newFences, 0, fences.length);
-        newFences[fences.length] = newFence;
-        fences = newFences;
+        for (int i = 0; i < randomLength; i++){
+            Fence segment = fenceManagers.get(fenceManagers.size() - 1).getSegments()[i];
+            grid.insert(segment, segment.getStartX(), segment.getStartY());
+        }
+
     }
 
     /**
@@ -423,8 +424,8 @@ public class GamePanel extends JPanel implements Runnable{
         double durationSeconds = duration / 1000.0;
 
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║          FINAL VISION PERFORMANCE METRICS                      ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        System.out.println(  "║          FINAL VISION PERFORMANCE METRICS                      ║");
+        System.out.println(  "╚════════════════════════════════════════════════════════════════╝");
         System.out.println("\nStrategy: " + GameConfig.STRATEGY);
         System.out.println("Description: " + GameConfig.getStrategyDescription());
         System.out.println("Cell Size: " + GameConfig.getGridCellSize() + "px");
