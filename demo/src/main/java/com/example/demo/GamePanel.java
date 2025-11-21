@@ -23,7 +23,7 @@ public class GamePanel extends JPanel implements Runnable{
     private GrassManager grassManager;
     private List<Bunny> bunnies = new ArrayList<>();
     private List<Wolf> wolves = new ArrayList<>();
-    private Fence[] fences = new Fence[0];
+    private FenceManager[] fenceManagers = new FenceManager[0];
     private Random random = new Random();
 
     public GamePanel(){
@@ -42,13 +42,13 @@ public class GamePanel extends JPanel implements Runnable{
         grassManager = new GrassManager(grid);
 
         //fences: create random fences with random lengths
-        fences = new Fence[fenceCount];
+        fenceManagers = new FenceManager[fenceCount];
         for (int i = 0; i < fenceCount; i++) {
             int randomLength = random.nextInt(5, 15);  // Random length between 5-14 segments
-            fences[i] = new Fence(randomLength);
+            fenceManagers[i] = new FenceManager(randomLength);
 
             for (int j = 0; j < randomLength; j++){
-                FenceSegment segment = fences[i].getSegments()[j];
+                Fence segment = fenceManagers[i].getSegments()[j];
                 grid.insert(segment, segment.getStartX(), segment.getStartY());
             }//inner loop
         }//outer loop.
@@ -148,9 +148,9 @@ public class GamePanel extends JPanel implements Runnable{
         drawBackground(g2);
 
         //fences: draw first (foreground layer)
-        for(int i = 0; i < fences.length; i ++){
-            if (fences[i] != null){
-                fences[i].draw(g2);
+        for(int i = 0; i < fenceManagers.length; i ++){
+            if (fenceManagers[i] != null){
+                fenceManagers[i].draw(g2);
             }
         }
 
@@ -241,13 +241,13 @@ public class GamePanel extends JPanel implements Runnable{
      */
     public void addFence() {
         int randomLength = random.nextInt(5, 15);
-        Fence newFence = new Fence(randomLength);
+        FenceManager newFenceManager = new FenceManager(randomLength);
 
         // Expand fences array
-        Fence[] newFences = new Fence[fences.length + 1];
-        System.arraycopy(fences, 0, newFences, 0, fences.length);
-        newFences[fences.length] = newFence;
-        fences = newFences;
+        FenceManager[] newFenceManagers = new FenceManager[fenceManagers.length + 1];
+        System.arraycopy(fenceManagers, 0, newFenceManagers, 0, fenceManagers.length);
+        newFenceManagers[fenceManagers.length] = newFenceManager;
+        fenceManagers = newFenceManagers;
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.example.demo.entities;
 
-import com.example.demo.GameConfig;
 import com.example.demo.Grid;
 
 import lombok.Getter;
@@ -40,7 +39,7 @@ public class Bunny extends Animal {
         List<Wolf> nearbyWolves = filterByType(nearbyAnimals, Wolf.class);
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
         List<Grass> nearbyGrass = getGrassInVision(grid);
-        List <FenceSegment> nearbyFences = getFencesInVision(grid);
+        List <Fence> nearbyFences = getFencesInVision(grid);
         // 1. FLEE from wolves (highest priority!)
         if (!nearbyWolves.isEmpty()) {
             Vector2d fleeForce = flee(nearbyWolves);
