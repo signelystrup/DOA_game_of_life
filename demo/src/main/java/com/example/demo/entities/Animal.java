@@ -133,4 +133,33 @@ public abstract class Animal {
 
         return fenceList;
     }
+
+    protected Vector2d getFenceForce(List <Fence> nearbyFences){
+        double dist = Double.MAX_VALUE;
+        Fence fence = null;
+
+        //find closest fence.
+        for (int i = 0; i < nearbyFences.size(); i ++){
+            double dx = worldX - nearbyFences.get(i).getStartX();
+            double dy = worldY - nearbyFences.get(i).getStartY();
+            double currentDist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+
+
+            if (currentDist < dist ) {
+                fence = nearbyFences.get(i);
+                dist = currentDist;
+            }
+        }
+
+        //find force:
+        double dx = worldX - fence.getStartX();
+        double dy = worldY - fence.getStartY();
+        Vector2d force = new Vector2d(dx, dy);
+
+        force.setMagnitude(speed); //set length.
+        force.sub(currMovement);
+
+        return force;
+    }
+
 }

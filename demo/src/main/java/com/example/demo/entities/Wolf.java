@@ -62,11 +62,11 @@ public class Wolf extends Animal {
 
         if (nearestBunny == null) return new Vector2d(0, 0);
 
-        Vector2d desired = new Vector2d(nearestBunny.getWorldX() - worldX, nearestBunny.getWorldY() - worldY);
-        desired.normalize();
-        desired.mult(speed);
+        Vector2d idealPath = new Vector2d(nearestBunny.getWorldX() - worldX, nearestBunny.getWorldY() - worldY);
+        idealPath.normalize();
+        idealPath.mult(speed);
 
-        Vector2d steer = desired.copy();
+        Vector2d steer = idealPath.copy();
         steer.sub(currMovement);
 
         return steer;
