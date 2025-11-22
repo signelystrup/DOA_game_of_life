@@ -81,6 +81,10 @@ public class Wolf extends Animal {
         return steer;
     }
 
+    public boolean hasEaten() {
+        return hasEaten;
+    }
+
     public void loadSprite(){
         if (sprite == null) {
             try {

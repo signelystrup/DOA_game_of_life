@@ -141,6 +141,7 @@ public class Bunny extends Animal {
     public void resetAfterBreeding() {
         hasEaten = false;
         breedingPartner = null;
+        resetStarvationTimer();  // Give fresh 10 seconds to find food
     }
 
     // Flee: move AWAY from wolves
@@ -222,6 +223,7 @@ public class Bunny extends Animal {
 
     public void eatGrass() {
         hasEaten = true;
+        resetStarvationTimer();
     }
 
     public boolean hasEaten() {
@@ -232,6 +234,23 @@ public class Bunny extends Animal {
         hasEaten = false;
         breedingPartner = null;
     }
+
+    /**
+     * Override to handle two-stage starvation:
+     * - Fed bunnies: 10 seconds to breed, then become hungry again
+     * - Hungry bunnies: 10 seconds to find food, or die
+     */
+    @Override
+    public void incrementStarvationTimer() {
+        framesSinceLastAte++;
+
+        // Fed bunny reaches 10 seconds without breeding
+        if (framesSinceLastAte >= STARVATION_THRESHOLD && hasEaten) {
+            hasEaten = false;           // Become hungry again
+            framesSinceLastAte = 0;     // Reset timer - now have 10 seconds to find food
+        }
+    }
+
     public void loadSprite(){
         if (sprite == null) {
             try {
