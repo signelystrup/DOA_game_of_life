@@ -28,6 +28,7 @@ public class GamePanel extends JPanel implements Runnable{
     private List <FenceManager> fenceManagers = new ArrayList<>();
 
     private List<Heart> hearts = new ArrayList<>();
+    private List<Death> deaths = new ArrayList<>();
     private Random random = new Random();
 
     // Performance metrics tracking - accumulate over entire game session
@@ -146,18 +147,20 @@ public class GamePanel extends JPanel implements Runnable{
             grassManager.update();
         }
 
-        // Update all bunnies: reset, move, accumulate (safe index-based loop)
+        // Update all bunnies: reset, move, accumulate, increment starvation (safe index-based loop)
         for(int i = 0; i < bunnies.size(); i++){
             Bunny bunny = bunnies.get(i);
             bunny.metrics.reset();
+            bunny.incrementStarvationTimer();
             moveEntity(bunny);
             totalBunnyMetrics.add(bunny.metrics);
         }
 
-        // Update all wolves: reset, move, accumulate (safe index-based loop)
+        // Update all wolves: reset, move, accumulate, increment starvation (safe index-based loop)
         for(int i = 0; i < wolves.size(); i++) {
             Wolf wolf = wolves.get(i);
             wolf.metrics.reset();
+            wolf.incrementStarvationTimer();
             moveEntity(wolf);
             totalWolfMetrics.add(wolf.metrics);
         }
@@ -167,6 +170,9 @@ public class GamePanel extends JPanel implements Runnable{
 
         // Check for bunny-bunny collisions (breeding)
         handleBunnyBreeding();
+
+        // Remove starved animals
+        handleStarvation();
 
         totalFrames++;
     }
@@ -260,6 +266,33 @@ public class GamePanel extends JPanel implements Runnable{
         }
     }
 
+    /**
+     * Remove animals that have starved (not eaten for 20 seconds)
+     */
+    private void handleStarvation() {
+        // Remove starved bunnies
+        for (int i = bunnies.size() - 1; i >= 0; i--) {
+            Bunny bunny = bunnies.get(i);
+            if (bunny.isStarving()) {
+                Death death = new Death(bunny.getWorldX(), bunny.getWorldY());
+                deaths.add(death);
+                grid.remove(bunny, bunny.getWorldX(), bunny.getWorldY());
+                bunnies.remove(i);
+            }
+        }
+
+        // Remove starved wolves
+        for (int i = wolves.size() - 1; i >= 0; i--) {
+            Wolf wolf = wolves.get(i);
+            if (wolf.isStarving()) {
+                Death death = new Death(wolf.getWorldX(), wolf.getWorldY());
+                deaths.add(death);
+                grid.remove(wolf, wolf.getWorldX(), wolf.getWorldY());
+                wolves.remove(i);
+            }
+        }
+    }
+
 
     @Override
     public void paintComponent(Graphics g){
@@ -300,6 +333,15 @@ public class GamePanel extends JPanel implements Runnable{
                 hearts.remove(i);
             }else {
                 hearts.get(i).draw(g2);
+            }
+        }
+
+        //draw deaths
+        for (int i = deaths.size() -1 ; i >= 0 ; i --){
+            if (deaths.get(i).getDeathTimer() == 0){
+                deaths.remove(i);
+            }else {
+                deaths.get(i).draw(g2);
             }
         }
 
