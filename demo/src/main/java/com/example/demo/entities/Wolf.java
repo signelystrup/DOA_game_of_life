@@ -13,6 +13,7 @@ public class Wolf extends Animal {
     static final double SPEED = 2.5;
     static final double VISION = 80.0;  // Wolves see farther than bunnies
     static BufferedImage sprite;
+    private boolean hasEaten = false;
 
     public Wolf(int x, int y){
         super(x, y, SPEED, VISION);
@@ -31,12 +32,20 @@ public class Wolf extends Animal {
         // Get nearby animals from grid
         List<Animal> nearbyAnimals = getAnimalsInVision(grid);
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
+        List <Fence> nearbyFences = getFencesInVision(grid);
 
         // SEEK bunnies (hunt them!)
         if (!nearbyBunnies.isEmpty()) {
             Vector2d seekForce = seekBunny(nearbyBunnies);
             seekForce.mult(2.0);  // Strong hunting instinct
             steering.add(seekForce);
+        }
+
+        // 4. avoid nearby fences:
+        if (!nearbyFences.isEmpty()){
+            Vector2d fenceForce = getFenceForce(nearbyFences);
+            fenceForce.mult(3.0);  //idk.
+            steering.add(fenceForce);
         }
 
         steering.limit(maxForce);
@@ -62,11 +71,11 @@ public class Wolf extends Animal {
 
         if (nearestBunny == null) return new Vector2d(0, 0);
 
-        Vector2d desired = new Vector2d(nearestBunny.getWorldX() - worldX, nearestBunny.getWorldY() - worldY);
-        desired.normalize();
-        desired.mult(speed);
+        Vector2d idealPath = new Vector2d(nearestBunny.getWorldX() - worldX, nearestBunny.getWorldY() - worldY);
+        idealPath.normalize();
+        idealPath.mult(speed);
 
-        Vector2d steer = desired.copy();
+        Vector2d steer = idealPath.copy();
         steer.sub(currMovement);
 
         return steer;
