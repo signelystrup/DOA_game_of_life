@@ -104,7 +104,9 @@ public abstract class Animal {
 
     // Helper: Get grass in vision from grid
     protected List<Grass> getGrassInVision(Grid grid) {
-        List<Object> nearby = grid.findNearby(worldX, worldY);
+        // Use the same search radius as for animals
+        int searchRadius = GameConfig.getSearchRadius(this.getClass());
+        List<Object> nearby = grid.findNearby(worldX, worldY, searchRadius);
         List<Grass> grassList = new ArrayList<>();
 
         for (Object obj : nearby) {
@@ -131,4 +133,50 @@ public abstract class Animal {
         }
         return filtered;
     }
+
+    // Abstract methods for eating and breeding behavior
+    // Each subclass defines what it can eat and how it breeds
+    
+    /**
+     * Check if this animal can eat the given entity
+     * @param entity The potential food
+     * @return true if this animal can eat this entity
+     */
+    public abstract boolean canEat(Object entity);
+    
+    /**
+     * Eat the given entity and mark this animal as fed
+     * @param entity The food to eat
+     */
+    public abstract void eat(Object entity);
+    
+    /**
+     * Check if this animal has eaten
+     * @return true if the animal has eaten
+     */
+    public abstract boolean hasEaten();
+    
+    /**
+     * Check if this animal can breed with another animal
+     * @param other The potential mate
+     * @return true if breeding is possible
+     */
+    public abstract boolean canBreedWith(Animal other);
+    
+    /**
+     * Reset the animal's state after breeding
+     */
+    public abstract void resetAfterBreeding();
+    
+    /**
+     * Get the distance threshold for eating (how close the animal needs to be)
+     * @return distance in pixels
+     */
+    public abstract double getEatingRange();
+    
+    /**
+     * Get the distance threshold for breeding (how close mates need to be)
+     * @return distance in pixels
+     */
+    public abstract double getBreedingRange();
 }
