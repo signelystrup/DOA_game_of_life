@@ -162,11 +162,13 @@ public class GamePanel extends JPanel implements Runnable{
             totalWolfMetrics.add(wolf.metrics);
         }
 
-        // Check for bunny-grass collisions (eating)
-        handleBunnyEating();
+        // Check for animal eating (generic for all animals)
+        handleAnimalEating(bunnies);  // Bunnies eat grass
+        handleAnimalEating(wolves);   // Wolves eat bunnies
 
-        // Check for bunny-bunny collisions (breeding)
-        handleBunnyBreeding();
+        // Check for animal breeding (generic for all animals)
+        handleAnimalBreeding(bunnies);
+        handleAnimalBreeding(wolves);
 
         totalFrames++;
     }
@@ -180,87 +182,128 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     /**
-     * Check if bunnies can eat grass
-     * Remove grass when eaten and mark bunny as fed
+     * GENERIC: Check if animals can eat their prey
+     * Works for any animal type - each animal defines what it can eat
      */
-    private void handleBunnyEating() {
-        List<Grass> grassToRemove = new ArrayList<>();
-        List<Object> allEntities = grid.getAllEntities();
+    private <T extends Animal> void handleAnimalEating(List<T> predators) {
+        List<Object> preyToRemove = new ArrayList<>();
 
-        // Get search radius for this animal type
-        int searchRadius = GameConfig.getSearchRadius(Bunny.class);
+        // Check each predator against nearby entities
+        for (T predator : predators) {
+            if (predator.hasEaten()) continue; // Skip if already eaten
 
-        // Check each bunny against nearby grass
-        for (Bunny bunny : bunnies) {
-            if (bunny.hasEaten()) continue; // Skip if already eaten
+            // Find nearby entities
+            int searchRadius = GameConfig.getSearchRadius(predator.getClass());
+            List<Object> nearby = grid.findNearby(predator.getWorldX(), predator.getWorldY(), searchRadius);
 
-            // Find nearby grass
-            List<Object> nearby = grid.findNearby(bunny.getWorldX(), bunny.getWorldY(), searchRadius);
-            for (Object obj : nearby) {
-                if (obj instanceof Grass) {
-                    Grass grass = (Grass) obj;
-
+            for (Object entity : nearby) {
+                // Check if this predator can eat this entity
+                if (predator.canEat(entity)) {
                     // Check collision (close enough to eat)
-                    double dx = bunny.getWorldX() - grass.getWorldX();
-                    double dy = bunny.getWorldY() - grass.getWorldY();
+                    double dx = predator.getWorldX() - getEntityX(entity);
+                    double dy = predator.getWorldY() - getEntityY(entity);
                     double distance = Math.sqrt(dx * dx + dy * dy);
 
-                    if (distance < 15) { // Eating range
-                        bunny.eatGrass();
-                        grassToRemove.add(grass);
-                        break; // One grass per frame
+                    if (distance < predator.getEatingRange()) {
+                        predator.eat(entity);
+                        preyToRemove.add(entity);
+                        break; // One prey per frame
                     }
                 }
             }
         }
 
-        // Remove eaten grass from grid
-        for (Grass grass : grassToRemove) {
-            grid.remove(grass, grass.getWorldX(), grass.getWorldY());
+        // Remove eaten prey from grid and lists
+        for (Object prey : preyToRemove) {
+            if (prey instanceof Grass) {
+                grid.remove(prey, ((Grass)prey).getWorldX(), ((Grass)prey).getWorldY());
+            } else if (prey instanceof Bunny) {
+                Bunny bunny = (Bunny) prey;
+                grid.remove(bunny, bunny.getWorldX(), bunny.getWorldY());
+                bunnies.remove(bunny);
+            }
         }
     }
 
     /**
-     * Check if two fed bunnies can breed
-     * Create a new bunny when conditions are met
+     * GENERIC: Check if animals can breed with each other
+     * Works for any animal type - each animal defines breeding rules
      */
-    private void handleBunnyBreeding() {
-        List<Bunny> newBunnies = new ArrayList<>();
+    private <T extends Animal> void handleAnimalBreeding(List<T> animals) {
+        List<T> newAnimals = new ArrayList<>();
 
-        // Check each pair of bunnies
-        for (int i = 0; i < bunnies.size(); i++) {
-            Bunny bunny1 = bunnies.get(i);
-            if (!bunny1.hasEaten()) continue;
+        // Check each pair of animals
+        for (int i = 0; i < animals.size(); i++) {
+            T animal1 = animals.get(i);
+            if (!animal1.hasEaten()) continue;
 
-            for (int j = i + 1; j < bunnies.size(); j++) {
-                Bunny bunny2 = bunnies.get(j);
+            for (int j = i + 1; j < animals.size(); j++) {
+                T animal2 = animals.get(j);
 
                 // Check if they can breed
-                if (bunny1.canBreedWith(bunny2)) {
-                    // Create baby bunny between the two parents
-                    int babyX = (bunny1.getWorldX() + bunny2.getWorldX()) / 2;
-                    int babyY = (bunny1.getWorldY() + bunny2.getWorldY()) / 2;
+                if (animal1.canBreedWith(animal2)) {
+                    // Create baby at midpoint between parents
+                    int babyX = (animal1.getWorldX() + animal2.getWorldX()) / 2;
+                    int babyY = (animal1.getWorldY() + animal2.getWorldY()) / 2;
 
-                    Bunny baby = new Bunny(babyX, babyY);
-                    newBunnies.add(baby);
+                    // Create new instance of the same type
+                    T baby = createAnimal(animal1.getClass(), babyX, babyY);
+                    if (baby != null) {
+                        newAnimals.add(baby);
+                    }
 
                     Heart heart = new Heart (babyX, babyY); //display heart.
                     hearts.add(heart);
 
                     // Reset parents after breeding
-                    bunny1.resetAfterBreeding();
-                    bunny2.resetAfterBreeding();
+                    animal1.resetAfterBreeding();
+                    animal2.resetAfterBreeding();
 
-                    break; // Each bunny can only breed once per cycle
+                    break; // Each animal can only breed once per cycle
                 }
             }
         }
 
-        // Add new bunnies to the game
-        for (Bunny baby : newBunnies) {
-            bunnies.add(baby);
+        // Add new animals to the game
+        for (T baby : newAnimals) {
+            animals.add(baby);
             grid.insert(baby, baby.getWorldX(), baby.getWorldY());
         }
+    }
+
+    /**
+     * Helper: Get X position of any entity
+     */
+    private int getEntityX(Object entity) {
+        if (entity instanceof Animal) return ((Animal)entity).getWorldX();
+        if (entity instanceof Grass) return ((Grass)entity).getWorldX();
+        return 0;
+    }
+
+    /**
+     * Helper: Get Y position of any entity
+     */
+    private int getEntityY(Object entity) {
+        if (entity instanceof Animal) return ((Animal)entity).getWorldY();
+        if (entity instanceof Grass) return ((Grass)entity).getWorldY();
+        return 0;
+    }
+
+    /**
+     * Helper: Create a new animal instance of the given type
+     */
+    @SuppressWarnings("unchecked")
+    private <T extends Animal> T createAnimal(Class<?> animalClass, int x, int y) {
+        try {
+            if (animalClass == Bunny.class) {
+                return (T) new Bunny(x, y);
+            } else if (animalClass == Wolf.class) {
+                return (T) new Wolf(x, y);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
