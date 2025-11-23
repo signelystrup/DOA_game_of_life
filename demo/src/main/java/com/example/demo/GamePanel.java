@@ -174,7 +174,8 @@ public class GamePanel extends JPanel implements Runnable{
         handleAnimalBreeding(wolves);
 
         // Remove starved animals
-        handleStarvation();
+        handleAnimalStarvation(bunnies);
+        handleAnimalStarvation(wolves);
 
         totalFrames++;
     }
@@ -278,28 +279,16 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     /**
-     * Remove animals that have starved (not eaten for 10 seconds)
+     * Handles animal starvation and shows death animation
      */
-    private void handleStarvation() {
-        // Remove starved bunnies
-        for (int i = bunnies.size() - 1; i >= 0; i--) {
-            Bunny bunny = bunnies.get(i);
-            if (bunny.isStarving()) {
-                Death death = new Death(bunny.getWorldX(), bunny.getWorldY());
+    private <T extends Animal> void handleAnimalStarvation(List<T> animals) {
+        for (int i = animals.size() - 1; i >= 0; i--) {
+            T animal = animals.get(i);
+            if (animal.isStarving()) {
+                Death death = new Death(animal.getWorldX(), animal.getWorldY());
                 deaths.add(death);
-                grid.remove(bunny, bunny.getWorldX(), bunny.getWorldY());
-                bunnies.remove(i);
-            }
-        }
-
-        // Remove starved wolves
-        for (int i = wolves.size() - 1; i >= 0; i--) {
-            Wolf wolf = wolves.get(i);
-            if (wolf.isStarving()) {
-                Death death = new Death(wolf.getWorldX(), wolf.getWorldY());
-                deaths.add(death);
-                grid.remove(wolf, wolf.getWorldX(), wolf.getWorldY());
-                wolves.remove(i);
+                grid.remove(animal, animal.getWorldX(), animal.getWorldY());
+                animals.remove(i);
             }
         }
     }
