@@ -33,6 +33,8 @@ public class Wolf extends Animal {
         // Get nearby animals from grid
         List<Animal> nearbyAnimals = getAnimalsInVision(grid);
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
+        List<Wolf> nearbyWolves = filterByType(nearbyAnimals, Wolf.class);
+        List<Fence> nearbyFences = getFencesInVision(grid);
 
         // 1. BREEDING behavior (if has eaten)
         if (hasEaten) {
@@ -63,10 +65,10 @@ public class Wolf extends Animal {
             }
         }
 
-        // 4. avoid nearby fences:
+        // 3. avoid nearby fences:
         if (!nearbyFences.isEmpty()){
             Vector2d fenceForce = getFenceForce(nearbyFences);
-            fenceForce.mult(3.0);  //idk.
+            fenceForce.mult(3.0);
             steering.add(fenceForce);
         }
 
