@@ -187,12 +187,15 @@ public class GamePanel extends JPanel implements Runnable{
         List<Grass> grassToRemove = new ArrayList<>();
         List<Object> allEntities = grid.getAllEntities();
 
+        // Get search radius for this animal type
+        int searchRadius = GameConfig.getSearchRadius(Bunny.class);
+        
         // Check each bunny against nearby grass
         for (Bunny bunny : bunnies) {
             if (bunny.hasEaten()) continue; // Skip if already eaten
 
             // Find nearby grass
-            List<Object> nearby = grid.findNearby(bunny.getWorldX(), bunny.getWorldY());
+            List<Object> nearby = grid.findNearby(bunny.getWorldX(), bunny.getWorldY(), searchRadius);
             for (Object obj : nearby) {
                 if (obj instanceof Grass) {
                     Grass grass = (Grass) obj;
