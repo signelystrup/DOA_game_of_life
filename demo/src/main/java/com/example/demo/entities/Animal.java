@@ -104,9 +104,7 @@ public abstract class Animal {
 
     // Helper: Get grass in vision from grid
     protected List<Grass> getGrassInVision(Grid grid) {
-        // Use the same search radius as for animals
-        int searchRadius = GameConfig.getSearchRadius(this.getClass());
-        List<Object> nearby = grid.findNearby(worldX, worldY, searchRadius);
+        List<Object> nearby = grid.findNearby(worldX, worldY);
         List<Grass> grassList = new ArrayList<>();
 
         for (Object obj : nearby) {
@@ -136,47 +134,96 @@ public abstract class Animal {
 
     // Abstract methods for eating and breeding behavior
     // Each subclass defines what it can eat and how it breeds
-    
+
     /**
      * Check if this animal can eat the given entity
      * @param entity The potential food
      * @return true if this animal can eat this entity
      */
     public abstract boolean canEat(Object entity);
-    
+
     /**
      * Eat the given entity and mark this animal as fed
      * @param entity The food to eat
      */
     public abstract void eat(Object entity);
-    
+
     /**
      * Check if this animal has eaten
      * @return true if the animal has eaten
      */
     public abstract boolean hasEaten();
-    
+
     /**
      * Check if this animal can breed with another animal
      * @param other The potential mate
      * @return true if breeding is possible
      */
     public abstract boolean canBreedWith(Animal other);
-    
+
     /**
      * Reset the animal's state after breeding
      */
     public abstract void resetAfterBreeding();
-    
+
     /**
      * Get the distance threshold for eating (how close the animal needs to be)
      * @return distance in pixels
      */
     public abstract double getEatingRange();
-    
+
     /**
      * Get the distance threshold for breeding (how close mates need to be)
      * @return distance in pixels
      */
     public abstract double getBreedingRange();
+
+    protected List<Fence> getFencesInVision(Grid grid){
+        List<Object> nearby = grid.findNearby(worldX, worldY);
+        List<Fence> fenceList = new ArrayList<>();
+
+        for (Object obj : nearby) {
+            if (obj instanceof Fence) {
+                Fence fence = (Fence) obj;
+
+                int dx = worldX - fence.getStartX();
+                int dy = worldY - fence.getStartY();
+                double dist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+
+                if (dist <= visionRadius) {
+                    fenceList.add(fence);
+                }
+            }
+        }//outer loop.
+
+        return fenceList;
+    }
+
+    protected Vector2d getFenceForce(List <Fence> nearbyFences){
+        double dist = Double.MAX_VALUE;
+        Fence fence = null;
+
+        //find closest fence.
+        for (int i = 0; i < nearbyFences.size(); i ++){
+            double dx = worldX - nearbyFences.get(i).getStartX();
+            double dy = worldY - nearbyFences.get(i).getStartY();
+            double currentDist = Math.sqrt(dx * dx + dy * dy); //pythagoras
+
+            if (currentDist < dist ) {
+                fence = nearbyFences.get(i);
+                dist = currentDist;
+            }
+        }
+
+        //find force:
+        double dx = worldX - fence.getStartX();
+        double dy = worldY - fence.getStartY();
+        Vector2d force = new Vector2d(dx, dy);
+
+        force.setMagnitude(speed); //set length.
+        force.sub(currMovement);
+
+        return force;
+    }
+
 }

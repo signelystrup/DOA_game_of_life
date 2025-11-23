@@ -1,11 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.entities.Bunny;
-import com.example.demo.entities.Fence;
-import com.example.demo.entities.Grass;
-import com.example.demo.entities.Wolf;
-import com.example.demo.entities.Animal;
-
+import com.example.demo.entities.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +25,9 @@ public class GamePanel extends JPanel implements Runnable{
     private GrassManager grassManager;
     private List<Bunny> bunnies = new ArrayList<>();
     private List<Wolf> wolves = new ArrayList<>();
-    private Fence[] fences = new Fence[0];
+    private List <FenceManager> fenceManagers = new ArrayList<>();
+
+    private List<Heart> hearts = new ArrayList<>();
     private Random random = new Random();
 
     // Performance metrics tracking - accumulate over entire game session
@@ -54,15 +51,18 @@ public class GamePanel extends JPanel implements Runnable{
         grid = new Grid(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, GameConfig.getGridCellSize());
         grassManager = new GrassManager(grid);
 
-        //fences: create random fences with random lengths
-        fences = new Fence[fenceCount];
+        //fences: create random fences with random lengths;
         for (int i = 0; i < fenceCount; i++) {
             int randomLength = random.nextInt(5, 15);  // Random length between 5-14 segments
-            fences[i] = new Fence(randomLength);
-        }
+            fenceManagers.add(new FenceManager(randomLength));
+
+            for (int j = 0; j < randomLength; j++){
+                Fence segment = fenceManagers.get(i).getSegments()[j];
+                grid.insert(segment, segment.getStartX(), segment.getStartY());
+            }//inner loop
+        }//outer loop.
 
         //bunnies: random placement
-        //bunnies = new Bunny[bunnyCount];
         for (int i = 0 ; i < bunnyCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
@@ -72,7 +72,6 @@ public class GamePanel extends JPanel implements Runnable{
         }
 
         //wolves: random placement
-        //wolves = new Wolf[wolfCount];
         for (int i = 0 ; i < wolfCount ; i ++){
             int randomX = random.nextInt(GameConfig.WORLD_WIDTH);
             int randomY = random.nextInt(GameConfig.WORLD_HEIGHT);
@@ -253,6 +252,9 @@ public class GamePanel extends JPanel implements Runnable{
                         newAnimals.add(baby);
                     }
 
+                    Heart heart = new Heart (babyX, babyY); //display heart.
+                    hearts.add(heart);
+
                     // Reset parents after breeding
                     animal1.resetAfterBreeding();
                     animal2.resetAfterBreeding();
@@ -314,10 +316,8 @@ public class GamePanel extends JPanel implements Runnable{
         drawBackground(g2);
 
         //fences: draw first (foreground layer)
-        for(int i = 0; i < fences.length; i ++){
-            if (fences[i] != null){
-                fences[i].draw(g2);
-            }
+        for(int i = 0; i < fenceManagers.size(); i ++){
+            fenceManagers.get(i).draw(g2);
         }
 
         // Draw all entities from grid (only if grid is initialized)
@@ -328,6 +328,7 @@ public class GamePanel extends JPanel implements Runnable{
 
         List<Object> allEntities = grid.getAllEntities();
 
+        //grass, wolves, bunnies
         for (int i = 0; i < allEntities.size(); i++) {
             Object obj = allEntities.get(i);
             if (obj instanceof Grass) {
@@ -336,6 +337,15 @@ public class GamePanel extends JPanel implements Runnable{
                 ((Bunny)obj).draw(g2);
             } else if (obj instanceof Wolf) {
                 ((Wolf)obj).draw(g2);
+            }
+        }
+
+        //draw hearts
+        for (int i = hearts.size() -1 ; i >= 0 ; i --){
+            if (hearts.get(i).getHeartTimer() == 0){
+                hearts.remove(i);
+            }else {
+                hearts.get(i).draw(g2);
             }
         }
 
@@ -407,13 +417,14 @@ public class GamePanel extends JPanel implements Runnable{
      */
     public void addFence() {
         int randomLength = random.nextInt(5, 15);
-        Fence newFence = new Fence(randomLength);
+        FenceManager newFenceManager = new FenceManager(randomLength);
+        fenceManagers.add(newFenceManager);
 
-        // Expand fences array
-        Fence[] newFences = new Fence[fences.length + 1];
-        System.arraycopy(fences, 0, newFences, 0, fences.length);
-        newFences[fences.length] = newFence;
-        fences = newFences;
+        for (int i = 0; i < randomLength; i++){
+            Fence segment = fenceManagers.get(fenceManagers.size() - 1).getSegments()[i];
+            grid.insert(segment, segment.getStartX(), segment.getStartY());
+        }
+
     }
 
     /**
@@ -430,6 +441,7 @@ public class GamePanel extends JPanel implements Runnable{
         }
         bunnies.clear();
         wolves.clear();
+        fenceManagers.clear();
         setUpGame(bunnyCount, wolfCount, grassCount, fenceCount);
 
         // Reset metrics for new session
@@ -459,8 +471,8 @@ public class GamePanel extends JPanel implements Runnable{
         double durationSeconds = duration / 1000.0;
 
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║          FINAL VISION PERFORMANCE METRICS                      ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        System.out.println(  "║          FINAL VISION PERFORMANCE METRICS                      ║");
+        System.out.println(  "╚════════════════════════════════════════════════════════════════╝");
         System.out.println("\nStrategy: " + GameConfig.STRATEGY);
         System.out.println("Description: " + GameConfig.getStrategyDescription());
         System.out.println("Cell Size: " + GameConfig.getGridCellSize() + "px");
@@ -540,7 +552,12 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void drawBackground(Graphics2D g2){
-        g2.drawImage(backgroundSprite, 0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, null);
+        int ratio = backgroundSprite.getWidth() / backgroundSprite.getHeight(); //keep aspect ratio.
+        int height = GameConfig.WORLD_HEIGHT ;
+        int width = GameConfig.WORLD_WIDTH * ratio;
+
+
+        g2.drawImage(backgroundSprite, 0, 0, width, height , null);
     }
 
     public void loadSprite(){

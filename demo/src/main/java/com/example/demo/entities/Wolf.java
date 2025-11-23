@@ -33,7 +33,6 @@ public class Wolf extends Animal {
         // Get nearby animals from grid
         List<Animal> nearbyAnimals = getAnimalsInVision(grid);
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
-        List<Wolf> nearbyWolves = filterByType(nearbyAnimals, Wolf.class);
 
         // 1. BREEDING behavior (if has eaten)
         if (hasEaten) {
@@ -64,6 +63,13 @@ public class Wolf extends Animal {
             }
         }
 
+        // 4. avoid nearby fences:
+        if (!nearbyFences.isEmpty()){
+            Vector2d fenceForce = getFenceForce(nearbyFences);
+            fenceForce.mult(3.0);  //idk.
+            steering.add(fenceForce);
+        }
+
         steering.limit(maxForce);
         return steering;
     }
@@ -87,11 +93,11 @@ public class Wolf extends Animal {
 
         if (nearestBunny == null) return new Vector2d(0, 0);
 
-        Vector2d desired = new Vector2d(nearestBunny.getWorldX() - worldX, nearestBunny.getWorldY() - worldY);
-        desired.normalize();
-        desired.mult(speed);
+        Vector2d idealPath = new Vector2d(nearestBunny.getWorldX() - worldX, nearestBunny.getWorldY() - worldY);
+        idealPath.normalize();
+        idealPath.mult(speed);
 
-        Vector2d steer = desired.copy();
+        Vector2d steer = idealPath.copy();
         steer.sub(currMovement);
 
         return steer;
@@ -159,9 +165,9 @@ public class Wolf extends Animal {
         if (!(other instanceof Wolf)) {
             return false;
         }
-        
+
         Wolf otherWolf = (Wolf) other;
-        
+
         if (!this.hasEaten || !otherWolf.hasEaten()) {
             return false;
         }
@@ -191,26 +197,26 @@ public class Wolf extends Animal {
         hasEaten = false;
         breedingPartner = null;
     }
-    
+
     // Implement abstract methods from Animal class
-    
+
     @Override
     public boolean canEat(Object entity) {
         return entity instanceof Bunny;
     }
-    
+
     @Override
     public void eat(Object entity) {
         if (entity instanceof Bunny) {
             eatBunny();
         }
     }
-    
+
     @Override
     public double getEatingRange() {
         return 15.0;  // Wolves need to be within 15 pixels to catch bunnies
     }
-    
+
     @Override
     public double getBreedingRange() {
         return 20.0;  // Wolves need to be within 20 pixels to breed

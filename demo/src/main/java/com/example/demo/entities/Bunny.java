@@ -1,6 +1,5 @@
 package com.example.demo.entities;
 
-import com.example.demo.GameConfig;
 import com.example.demo.Grid;
 
 import lombok.Getter;
@@ -41,6 +40,7 @@ public class Bunny extends Animal {
         List<Wolf> nearbyWolves = filterByType(nearbyAnimals, Wolf.class);
         List<Bunny> nearbyBunnies = filterByType(nearbyAnimals, Bunny.class);
         List<Grass> nearbyGrass = getGrassInVision(grid);
+        List <Fence> nearbyFences = getFencesInVision(grid);
 
         // 1. FLEE from wolves (HIGHEST priority!)
         if (!nearbyWolves.isEmpty()) {
@@ -77,6 +77,13 @@ public class Bunny extends Animal {
                 seekForce.mult(2.0);  // Medium-high priority
                 steering.add(seekForce);
             }
+        }
+
+        // 4. avoid nearby fences:
+        if (!nearbyFences.isEmpty()){
+            Vector2d fenceForce = getFenceForce(nearbyFences);
+            fenceForce.mult(3.0);  //idk.
+            steering.add(fenceForce);
         }
 
         steering.limit(maxForce);
@@ -161,7 +168,7 @@ public class Bunny extends Animal {
             }
         }
 
-        if (fleeDir.magnitude() > 0) {
+        if (fleeDir.length() > 0) {
             fleeDir.normalize();
             fleeDir.mult(speed);
             fleeDir.sub(currMovement);

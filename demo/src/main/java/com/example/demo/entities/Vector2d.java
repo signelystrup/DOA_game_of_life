@@ -30,13 +30,13 @@ public class Vector2d {
         }
     }
     
-    public double magnitude() { 
+    public double length() { //magnitude
         return Math.sqrt(x*x + y*y); 
     }
     
     public void normalize() { 
-        double m = magnitude();
-        if (m > 0) div(m); // a/c and b/c
+        double l = length();
+        if (l > 0) div(l); //a and b divided by length. example: 5^2 = 4^2 + ^3  <=>  1^2 = 0.8^2 + 0.6^2
     }
     
     public void setMagnitude(double newMag) {
@@ -45,7 +45,7 @@ public class Vector2d {
     }
     
     public void limit(double max) {
-        if (magnitude() > max) {
+        if (length() > max) {
             normalize();
             mult(max);
         }
