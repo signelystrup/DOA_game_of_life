@@ -189,7 +189,7 @@ public class GamePanel extends JPanel implements Runnable{
 
         // Get search radius for this animal type
         int searchRadius = GameConfig.getSearchRadius(Bunny.class);
-        
+
         // Check each bunny against nearby grass
         for (Bunny bunny : bunnies) {
             if (bunny.hasEaten()) continue; // Skip if already eaten
