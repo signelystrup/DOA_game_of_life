@@ -125,13 +125,21 @@ public class Bunny extends Animal {
     }
 
     // Check if close enough to breed with another bunny
-    public boolean canBreedWith(Bunny other) {
-        if (!this.hasEaten || !other.hasEaten()) {
+    @Override
+    public boolean canBreedWith(Animal other) {
+        // Must be same species
+        if (!(other instanceof Bunny)) {
+            return false;
+        }
+        
+        Bunny otherBunny = (Bunny) other;
+        
+        if (!this.hasEaten || !otherBunny.hasEaten()) {
             return false;
         }
 
-        double dx = worldX - other.getWorldX();
-        double dy = worldY - other.getWorldY();
+        double dx = worldX - otherBunny.getWorldX();
+        double dy = worldY - otherBunny.getWorldY();
         double dist = Math.sqrt(dx * dx + dy * dy);
 
         return dist < 20;  // Must be within 20 pixels
@@ -249,6 +257,30 @@ public class Bunny extends Animal {
             hasEaten = false;           // Become hungry again
             framesSinceLastAte = 0;     // Reset timer - now have 10 seconds to find food
         }
+    }
+
+    // Implement abstract methods from Animal class
+
+    @Override
+    public boolean canEat(Object entity) {
+        return entity instanceof Grass;
+    }
+
+    @Override
+    public void eat(Object entity) {
+        if (entity instanceof Grass) {
+            eatGrass();
+        }
+    }
+
+    @Override
+    public double getEatingRange() {
+        return 15.0;  // Bunnies need to be within 15 pixels to eat grass
+    }
+
+    @Override
+    public double getBreedingRange() {
+        return 20.0;  // Bunnies need to be within 20 pixels to breed
     }
 
     public void loadSprite(){
