@@ -395,6 +395,7 @@ public class GamePanel extends JPanel implements Runnable{
         }
         bunnies.clear();
         wolves.clear();
+        fenceManagers.clear();
         setUpGame(bunnyCount, wolfCount, grassCount, fenceCount);
 
         // Reset metrics for new session
