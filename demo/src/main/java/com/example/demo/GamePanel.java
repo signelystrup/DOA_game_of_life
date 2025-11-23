@@ -195,7 +195,7 @@ public class GamePanel extends JPanel implements Runnable{
             // Find nearby entities
             int searchRadius = GameConfig.getSearchRadius(predator.getClass());
             List<Object> nearby = grid.findNearby(predator.getWorldX(), predator.getWorldY(), searchRadius);
-            
+
             for (Object entity : nearby) {
                 // Check if this predator can eat this entity
                 if (predator.canEat(entity)) {

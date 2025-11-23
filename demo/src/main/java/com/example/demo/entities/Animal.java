@@ -104,8 +104,9 @@ public abstract class Animal {
 
     // Helper: Get grass in vision from grid
     protected List<Grass> getGrassInVision(Grid grid) {
-        // Use the same search radius as for animals
+        // Get search radius for this animal type
         int searchRadius = GameConfig.getSearchRadius(this.getClass());
+
         List<Object> nearby = grid.findNearby(worldX, worldY, searchRadius);
         List<Grass> grassList = new ArrayList<>();
 
@@ -181,7 +182,9 @@ public abstract class Animal {
     public abstract double getBreedingRange();
 
     protected List<Fence> getFencesInVision(Grid grid){
+        // Get search radius for this animal type
         int searchRadius = GameConfig.getSearchRadius(this.getClass());
+
         List<Object> nearby = grid.findNearby(worldX, worldY, searchRadius);
         List<Fence> fenceList = new ArrayList<>();
 

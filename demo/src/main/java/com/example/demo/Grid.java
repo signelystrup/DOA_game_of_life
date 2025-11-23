@@ -85,16 +85,6 @@ public class Grid {
     }
 
     /**
-     * Find all entities in nearby cells (3x3 grid around position)
-     * Convenience method that uses radius 1
-     *
-     * @return List of entities from nearby cells
-     */
-    public List<Object> findNearby(float worldX, float worldY) {
-        return findNearby(worldX, worldY, 1);
-    }
-
-    /**
      * Clear all entities from grid
      */
     public void clear() {
