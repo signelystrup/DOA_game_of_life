@@ -9,10 +9,7 @@ import java.io.IOException;
 
 @Getter
 public class Grass {
-    //made it public because they were being called from other packages, we could also do setters/getters to deal with this in future.
-    public int worldX, worldY;
-
-    protected int gridX, gridY;
+    private int worldX, worldY;
     static BufferedImage sprite;
 
     public Grass(int worldX, int worldY){
@@ -23,10 +20,6 @@ public class Grass {
 
     public void draw(Graphics2D g2){
         g2.drawImage(sprite, worldX, worldY, 24, 24, null);
-    }
-
-    public void update(){
-
     }
 
     public void loadSprite(){

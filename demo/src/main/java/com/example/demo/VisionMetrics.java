@@ -1,9 +1,12 @@
 package com.example.demo;
 
+import lombok.Getter;
+
 /**
  * Tracks efficiency of vision/grid searches for performance analysis.
  * Measures how many entities are fetched from grid vs actually within vision range.
  */
+@Getter
 public class VisionMetrics {
     private int entitiesFetched = 0;    // Total entities retrieved from grid
     private int entitiesInVision = 0;   // Entities actually within vision range
@@ -35,20 +38,6 @@ public class VisionMetrics {
     public double getEfficiencyPercent() {
         if (entitiesFetched == 0) return 100.0;
         return 100.0 * entitiesInVision / entitiesFetched;
-    }
-
-    /**
-     * Get total entities fetched
-     */
-    public int getEntitiesFetched() {
-        return entitiesFetched;
-    }
-
-    /**
-     * Get entities in vision
-     */
-    public int getEntitiesInVision() {
-        return entitiesInVision;
     }
 
     /**

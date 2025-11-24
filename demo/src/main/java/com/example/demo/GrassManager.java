@@ -97,8 +97,8 @@ public class GrassManager {
             int offsetX = random.nextInt(SPREAD_RADIUS * 2) - SPREAD_RADIUS;
             int offsetY = random.nextInt(SPREAD_RADIUS * 2) - SPREAD_RADIUS;
 
-            int newX = existingGrass.worldX + offsetX;
-            int newY = existingGrass.worldY + offsetY;
+            int newX = existingGrass.getWorldX() + offsetX;
+            int newY = existingGrass.getWorldY() + offsetY;
 
             newX = Math.max(0, Math.min(newX, GameConfig.WORLD_WIDTH - 1));
             newY = Math.max(0, Math.min(newY, GameConfig.WORLD_HEIGHT - 1));
