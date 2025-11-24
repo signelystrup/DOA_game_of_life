@@ -25,7 +25,7 @@ public class GameConfig {
     }
 
     // World dimensions
-    public static final int WORLD_WIDTH = 1300;
+    public static final int WORLD_WIDTH = 1600;
     public static final int WORLD_HEIGHT = 800;
 
     /**
