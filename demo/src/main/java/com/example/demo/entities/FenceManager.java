@@ -37,49 +37,7 @@ public class FenceManager {
     }
 
     public void draw(Graphics2D g2){
-        g2.setColor(Color.BLACK);
-
-        /*
-        for (int i = 0; i < segments.length; i ++) {
-            Fence segment = segments[i];
-            BufferedImage sprite;
-
-
-            int width = 24;
-            int height = 24;
-            int x = Math.min(segment.getStartX(), segment.getEndX()) ;
-            int y = Math.max(segment.getStartY(), segment.getEndX()) - height ;
-
-            if (segment.getStartX() == segment.getEndX()){
-                sprite = verticalSprite;
-                x -= 20;
-            }else if (segment.getStartY() == segment.getEndY()){
-                sprite = horizontalSprite;
-            }else if (     segment.getStartX() < segment.getEndX()
-                        && segment.getStartY() < segment.getEndY()
-                        || segment.getStartX() > segment.getEndX()
-                        && segment.getStartY() > segment.getEndY()){
-                sprite = sDiagonalSprite;
-                height *= 2;
-                y -= 16;
-            }else{
-                sprite = zDiagonalSprite;
-                height *= 2;
-                y -= 16;
-            }
-
-            //g2.drawLine(fence[i].getStartX(), fence[i].getStartY(), fence[i].getEndX(), fence[i].getEndY());
-
-            g2.drawImage(sprite, x, y, width, height, null);
-        }//end of for loop.
-
-
-         */
-
         BufferedImage sprite;
-
-
-        g2.setColor(Color.WHITE);
 
         for (int i = 0; i < segments.length; i ++) {
             Fence fence = segments[i];
@@ -88,7 +46,7 @@ public class FenceManager {
             int startY = Math.min(fence.getStartY(), fence.getEndY()) - height;
             int startX = Math.min(fence.getStartX(), fence.getEndX());
 
-
+            
             if (fence.getA() == 0){
                 sprite = verticalSprite;
                 startX -= 18;
@@ -103,8 +61,6 @@ public class FenceManager {
             }else{
                 sprite = horizontalSprite;
             }
-
-
 
             g2.drawImage(sprite, startX, startY, 24, height, null);
         }
