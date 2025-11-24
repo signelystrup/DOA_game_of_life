@@ -27,6 +27,10 @@ public abstract class Animal {
     // Performance metrics tracking
     public VisionMetrics metrics = new VisionMetrics();
 
+    // Starvation tracking
+    protected int framesSinceLastAte = 0;
+    protected static final int STARVATION_THRESHOLD = 600; // 10 seconds at 60fps
+
     public Animal(int worldX, int worldY, double speed, double visionRadius){
         this.worldX = worldX;
         this.worldY = worldY;
@@ -63,6 +67,27 @@ public abstract class Animal {
         if (worldY > GameConfig.WORLD_HEIGHT) worldY = 0;
     }
 
+    /**
+     * Increment starvation timer (call once per frame)
+     */
+    public void incrementStarvationTimer() {
+        framesSinceLastAte++;
+    }
+
+    /**
+     * Reset starvation timer when eating
+     */
+    public void resetStarvationTimer() {
+        framesSinceLastAte = 0;
+    }
+
+    /**
+     * Check if animal is starving
+     */
+    public boolean isStarving() {
+        return framesSinceLastAte >= STARVATION_THRESHOLD;
+    }
+
     protected abstract Vector2d calculateSteeringForce(Grid grid);
 
     // Helper: Get animals in vision from grid (with metrics tracking)
@@ -84,8 +109,6 @@ public abstract class Animal {
                 if (other != this) {
                     double dist = Math.sqrt((worldX - other.worldX) * (worldX - other.worldX) +
                                           (worldY - other.worldY) * (worldY - other.worldY));
-
-                    metrics.recordCheck(); // Track distance calculation
 
                     if (dist <= visionRadius) {
                         animals.add(other);

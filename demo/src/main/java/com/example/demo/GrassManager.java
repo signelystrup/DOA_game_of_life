@@ -18,10 +18,11 @@ public class GrassManager {
     private int proximityTimer = 0;
     private int randomTimer = 0;
 
-    private final int PROXIMITY_INTERVAL = 120;  // 2.0 seconds at 60 FPS
-    private final int RANDOM_INTERVAL = 240;     // 4.0 seconds at 60 FPS
+    private final int PROXIMITY_INTERVAL = 60;   // 1.0 second at 60 FPS (faster)
+    private final int RANDOM_INTERVAL = 120;     // 2.0 seconds at 60 FPS (faster)
     private final int SPREAD_RADIUS = 25;        // Pixels
     private final int MAX_GRASS_COUNT = 100;     // Maximum grass patches allowed
+    private final int LOW_GRASS_THRESHOLD = 50;  // Boost growth when below this
 
     public GrassManager(Grid grid) {
         this.grid = grid;
@@ -36,16 +37,28 @@ public class GrassManager {
         proximityTimer++;
         randomTimer++;
 
-        if (proximityTimer >= PROXIMITY_INTERVAL) {
+        int grassCount = getGrassCount();
+        boolean lowGrass = grassCount < LOW_GRASS_THRESHOLD;
+
+        // Set intervals based on grass count
+        int proximityThreshold = PROXIMITY_INTERVAL;
+        int randomThreshold = RANDOM_INTERVAL;
+
+        if (lowGrass) {
+            proximityThreshold = PROXIMITY_INTERVAL / 2;  // 2x faster when low
+            randomThreshold = RANDOM_INTERVAL / 2;        // 2x faster when low
+        }
+
+        if (proximityTimer >= proximityThreshold) {
             proximityTimer = 0;
-            if (getGrassCount() < MAX_GRASS_COUNT) {
+            if (grassCount < MAX_GRASS_COUNT) {
                 spawnNearExistingGrass();
             }
         }
 
-        if (randomTimer >= RANDOM_INTERVAL) {
+        if (randomTimer >= randomThreshold) {
             randomTimer = 0;
-            if (getGrassCount() < MAX_GRASS_COUNT) {
+            if (grassCount < MAX_GRASS_COUNT) {
                 spawnAtRandomLocation();
             }
         }
@@ -84,8 +97,8 @@ public class GrassManager {
             int offsetX = random.nextInt(SPREAD_RADIUS * 2) - SPREAD_RADIUS;
             int offsetY = random.nextInt(SPREAD_RADIUS * 2) - SPREAD_RADIUS;
 
-            int newX = existingGrass.worldX + offsetX;
-            int newY = existingGrass.worldY + offsetY;
+            int newX = existingGrass.getWorldX() + offsetX;
+            int newY = existingGrass.getWorldY() + offsetY;
 
             newX = Math.max(0, Math.min(newX, GameConfig.WORLD_WIDTH - 1));
             newY = Math.max(0, Math.min(newY, GameConfig.WORLD_HEIGHT - 1));

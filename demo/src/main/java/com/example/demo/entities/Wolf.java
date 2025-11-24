@@ -189,6 +189,7 @@ public class Wolf extends Animal {
 
     public void eatBunny() {
         hasEaten = true;
+        resetStarvationTimer();  // Reset timer when eating
     }
 
     public boolean hasEaten() {
@@ -198,6 +199,22 @@ public class Wolf extends Animal {
     public void resetEaten() {
         hasEaten = false;
         breedingPartner = null;
+    }
+
+    /**
+     * Override to handle two-stage starvation:
+     * - Fed wolves: 10 seconds to breed, then become hungry again
+     * - Hungry wolves: 10 seconds to find food (bunny), or die
+     */
+    @Override
+    public void incrementStarvationTimer() {
+        framesSinceLastAte++;
+
+        // Fed wolf reaches 10 seconds without breeding
+        if (framesSinceLastAte >= STARVATION_THRESHOLD && hasEaten) {
+            hasEaten = false;           // Become hungry again
+            framesSinceLastAte = 0;     // Reset timer - now have 10 seconds to find food
+        }
     }
 
     // Implement abstract methods from Animal class

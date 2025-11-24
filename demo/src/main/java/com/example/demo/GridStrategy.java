@@ -8,12 +8,12 @@ import com.example.demo.entities.Wolf;
  */
 public enum GridStrategy {
     /**
-     * Simple approach: Grid size based on max vision (wolf vision = 80)
+     * Optimized for wolves: Grid size based on wolf vision (80px)
      * All entities search 3×3 grid
-     * Pro: Simple, guaranteed to work
+     * Pro: Simple, guaranteed to work for wolves
      * Con: May fetch unnecessary entities for bunnies
      */
-    SAFE_MAX_VISION {
+    OPTIMIZED_FOR_WOLVES {
         @Override
         public int getCellSize() {
             return Math.max(RABBIT_VISION, WOLF_VISION); // 80
@@ -26,18 +26,18 @@ public enum GridStrategy {
 
         @Override
         public String getDescription() {
-            return "Safe: cell=80px, all entities 3×3 grid";
+            return "Optimized for wolves: cell=80px, all entities 3×3 grid";
         }
     },
 
     /**
-     * Optimized for rabbits (most common entity)
-     * Grid size = 40 (rabbit vision)
-     * Rabbits: 3×3 (1 cell), Wolves: 5×5 (2 cells)
-     * Pro: Rabbits fetch fewer entities
+     * Optimized for bunnies (most common entity)
+     * Grid size = 40 (bunny vision)
+     * Bunnies: 3×3 (1 cell), Wolves: 5×5 (2 cells)
+     * Pro: Bunnies fetch fewer entities
      * Con: Wolves do more grid checks
      */
-    OPTIMIZED_FOR_COMMON {
+    OPTIMIZED_FOR_BUNNIES {
         @Override
         public int getCellSize() {
             return RABBIT_VISION; // 40
@@ -53,18 +53,18 @@ public enum GridStrategy {
 
         @Override
         public String getDescription() {
-            return "Optimized: cell=40px, bunnies 3×3, wolves 5×5";
+            return "Optimized for bunnies: cell=40px, bunnies 3×3, wolves 5×5";
         }
     },
 
     /**
-     * Very small cells for high entity density
-     * Grid size = 20 (half of rabbit vision)
+     * Optimized for efficiency: Very small cells for high entity density
+     * Grid size = 20 (half of bunny vision)
      * More grid checks but fewer entities per cell
      * Pro: Very small cells = minimal wasted entities
      * Con: More cell boundary checks
      */
-    SMALL_CELLS {
+    OPTIMIZED_FOR_EFFICIENCY {
         @Override
         public int getCellSize() {
             return 20; // Half of rabbit vision
@@ -80,7 +80,7 @@ public enum GridStrategy {
 
         @Override
         public String getDescription() {
-            return "Small cells: cell=20px, bunnies 5×5, wolves 9×9";
+            return "Optimized for efficiency: cell=20px, bunnies 5×5, wolves 9×9";
         }
     };
 

@@ -34,6 +34,14 @@ public class Main {
             JTextField fenceField = new JTextField("2", 3);
             fenceField.setForeground(Color.BLACK);
 
+            //Strategy dropdown:
+            JComboBox<String> strategyCombo = new JComboBox<>(new String[]{
+                "Optimized for Wolves",
+                "Optimized for Bunnies",
+                "Optimized for Efficiency"
+            });
+            strategyCombo.setSelectedIndex(0); // Default: OPTIMIZED_FOR_WOLVES
+
             //Start button:
             JButton startButton = new JButton("Start Game");
 
@@ -45,6 +53,15 @@ public class Main {
             JButton resetButton = new JButton("Reset Game");
 
             //Add components to top panel:
+            JLabel strategyLabel = new JLabel("Strategy:");
+            strategyLabel.setForeground(Color.BLACK);
+            topPanel.add(strategyLabel);
+            topPanel.add(strategyCombo);
+
+            JLabel separator0 = new JLabel("|");
+            separator0.setForeground(Color.BLACK);
+            topPanel.add(separator0);
+
             JLabel bunnyLabel = new JLabel("Bunnies:");
             bunnyLabel.setForeground(Color.BLACK);
             topPanel.add(bunnyLabel);
@@ -83,6 +100,16 @@ public class Main {
                     int grassCount = Integer.parseInt(grassField.getText());
                     int fenceCount = Integer.parseInt(fenceField.getText());
 
+                    // Set strategy based on dropdown selection
+                    int selected = strategyCombo.getSelectedIndex();
+                    if (selected == 0) {
+                        GameConfig.STRATEGY = GridStrategy.OPTIMIZED_FOR_WOLVES;
+                    } else if (selected == 1) {
+                        GameConfig.STRATEGY = GridStrategy.OPTIMIZED_FOR_BUNNIES;
+                    } else if (selected == 2) {
+                        GameConfig.STRATEGY = GridStrategy.OPTIMIZED_FOR_EFFICIENCY;
+                    }
+
                     gamePanel.resetGame(bunnyCount, wolfCount, grassCount, fenceCount);
                     if (!gamePanel.isGameRunning()) {
                         gamePanel.startGameThread();
@@ -103,6 +130,17 @@ public class Main {
                     int wolfCount = Integer.parseInt(wolfField.getText());
                     int grassCount = Integer.parseInt(grassField.getText());
                     int fenceCount = Integer.parseInt(fenceField.getText());
+
+                    // Set strategy based on dropdown selection
+                    int selected = strategyCombo.getSelectedIndex();
+                    if (selected == 0) {
+                        GameConfig.STRATEGY = GridStrategy.OPTIMIZED_FOR_WOLVES;
+                    } else if (selected == 1) {
+                        GameConfig.STRATEGY = GridStrategy.OPTIMIZED_FOR_BUNNIES;
+                    } else if (selected == 2) {
+                        GameConfig.STRATEGY = GridStrategy.OPTIMIZED_FOR_EFFICIENCY;
+                    }
+
                     gamePanel.resetGame(bunnyCount, wolfCount, grassCount, fenceCount);
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(jFrame, "Please enter valid numbers!");

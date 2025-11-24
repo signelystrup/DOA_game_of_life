@@ -11,8 +11,8 @@ public class BenchmarkRunner {
         System.setProperty("java.awt.headless", "true");
 
         // Benchmark configuration - change these values to test different scenarios
-        int bunnyCount = 5000;
-        int wolfCount = 1000;
+        int bunnyCount = 50;
+        int wolfCount = 10;
         int grassCount = 10;
         int fenceCount = 2;
         int durationSeconds = 60;
@@ -26,9 +26,9 @@ public class BenchmarkRunner {
                            " wolves, " + grassCount + " grass, " + fenceCount + " fences\n");
 
         GridStrategy[] strategies = {
-            GridStrategy.SAFE_MAX_VISION,
-            GridStrategy.OPTIMIZED_FOR_COMMON,
-            GridStrategy.SMALL_CELLS
+            GridStrategy.OPTIMIZED_FOR_WOLVES,
+            GridStrategy.OPTIMIZED_FOR_BUNNIES,
+            GridStrategy.OPTIMIZED_FOR_EFFICIENCY
         };
 
         for (int i = 0; i < strategies.length; i++) {

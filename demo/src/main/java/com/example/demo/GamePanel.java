@@ -28,6 +28,7 @@ public class GamePanel extends JPanel implements Runnable{
     private List <FenceManager> fenceManagers = new ArrayList<>();
 
     private List<Heart> hearts = new ArrayList<>();
+    private List<Death> deaths = new ArrayList<>();
     private Random random = new Random();
 
     // Performance metrics tracking - accumulate over entire game session
@@ -146,18 +147,20 @@ public class GamePanel extends JPanel implements Runnable{
             grassManager.update();
         }
 
-        // Update all bunnies: reset, move, accumulate (safe index-based loop)
+        // Update all bunnies: reset, move, accumulate, increment starvation (safe index-based loop)
         for(int i = 0; i < bunnies.size(); i++){
             Bunny bunny = bunnies.get(i);
             bunny.metrics.reset();
+            bunny.incrementStarvationTimer();
             moveEntity(bunny);
             totalBunnyMetrics.add(bunny.metrics);
         }
 
-        // Update all wolves: reset, move, accumulate (safe index-based loop)
+        // Update all wolves: reset, move, accumulate, increment starvation (safe index-based loop)
         for(int i = 0; i < wolves.size(); i++) {
             Wolf wolf = wolves.get(i);
             wolf.metrics.reset();
+            wolf.incrementStarvationTimer();
             moveEntity(wolf);
             totalWolfMetrics.add(wolf.metrics);
         }
@@ -169,6 +172,10 @@ public class GamePanel extends JPanel implements Runnable{
         // Check for animal breeding (generic for all animals)
         handleAnimalBreeding(bunnies);
         handleAnimalBreeding(wolves);
+
+        // Remove starved animals
+        handleAnimalStarvation(bunnies);
+        handleAnimalStarvation(wolves);
 
         totalFrames++;
     }
@@ -272,6 +279,21 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     /**
+     * Handles animal starvation and shows death animation
+     */
+    private <T extends Animal> void handleAnimalStarvation(List<T> animals) {
+        for (int i = animals.size() - 1; i >= 0; i--) {
+            T animal = animals.get(i);
+            if (animal.isStarving()) {
+                Death death = new Death(animal.getWorldX(), animal.getWorldY());
+                deaths.add(death);
+                grid.remove(animal, animal.getWorldX(), animal.getWorldY());
+                animals.remove(i);
+            }
+        }
+    }
+
+    /**
      * Helper: Get X position of any entity
      */
     private int getEntityX(Object entity) {
@@ -346,6 +368,15 @@ public class GamePanel extends JPanel implements Runnable{
                 hearts.remove(i);
             }else {
                 hearts.get(i).draw(g2);
+            }
+        }
+
+        //draw deaths
+        for (int i = deaths.size() -1 ; i >= 0 ; i --){
+            if (deaths.get(i).getDeathTimer() == 0){
+                deaths.remove(i);
+            }else {
+                deaths.get(i).draw(g2);
             }
         }
 
@@ -516,8 +547,8 @@ public class GamePanel extends JPanel implements Runnable{
             // Write headers if file is new
             if (!fileExists) {
                 writer.println("Strategy,Cell_Size,Duration_Sec,Total_Frames,Avg_FPS," +
-                        "Bunny_Count,Bunny_Fetched,Bunny_InVision,Bunny_Wasted,Bunny_Efficiency,Bunny_Checks," +
-                        "Wolf_Count,Wolf_Fetched,Wolf_InVision,Wolf_Wasted,Wolf_Efficiency,Wolf_Checks");
+                        "Bunny_Count,Total_Bunnies_Fetched,Total_Bunnies_In_Vision,Total_Bunnies_Wasted,Bunny_Efficiency," +
+                        "Wolf_Count,Total_Wolves_Fetched,Total_Wolves_In_Vision,Total_Wolves_Wasted,Wolf_Efficiency");
             }
 
             // Calculate values
@@ -526,7 +557,7 @@ public class GamePanel extends JPanel implements Runnable{
             double avgFPS = totalFrames / durationSeconds;
 
             // Write data row
-            writer.printf("%s,%d,%.1f,%d,%.1f,%d,%d,%d,%d,%.1f,%d,%d,%d,%d,%d,%.1f,%d%n",
+            writer.printf("%s,%d,%.1f,%d,%.1f,%d,%d,%d,%d,%.1f,%d,%d,%d,%d,%.1f%n",
                     GameConfig.STRATEGY,
                     GameConfig.getGridCellSize(),
                     durationSeconds,
@@ -537,13 +568,11 @@ public class GamePanel extends JPanel implements Runnable{
                     totalBunnyMetrics.getEntitiesInVision(),
                     totalBunnyMetrics.getWastedEntities(),
                     totalBunnyMetrics.getEfficiencyPercent(),
-                    totalBunnyMetrics.getVisionChecks(),
                     wolves.size(),
                     totalWolfMetrics.getEntitiesFetched(),
                     totalWolfMetrics.getEntitiesInVision(),
                     totalWolfMetrics.getWastedEntities(),
-                    totalWolfMetrics.getEfficiencyPercent(),
-                    totalWolfMetrics.getVisionChecks());
+                    totalWolfMetrics.getEfficiencyPercent());
 
             System.out.println("✓ Results saved to " + filename);
         } catch (IOException e) {

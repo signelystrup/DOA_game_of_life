@@ -7,9 +7,9 @@ package com.example.demo;
  */
 public class GameConfig {
     // *** CHANGE THIS LINE TO SWITCH GRID STRATEGIES ***
-    // we have 3 strategies, "SAFE_MAX_VISION" "OPTIMIZED_FOR_COMMON" "SMALL_CELLS"
+    // we have 3 strategies: "OPTIMIZED_FOR_WOLVES" "OPTIMIZED_FOR_BUNNIES" "OPTIMIZED_FOR_EFFICIENCY"
     // Note: Non-final to allow runtime strategy changes (used by BenchmarkRunner)
-    public static GridStrategy STRATEGY = GridStrategy.SAFE_MAX_VISION;
+    public static GridStrategy STRATEGY = GridStrategy.OPTIMIZED_FOR_WOLVES;
 
     // Vision ranges for each species (in pixels)
     public static final int RABBIT_VISION = 40;
@@ -25,7 +25,7 @@ public class GameConfig {
     }
 
     // World dimensions
-    public static final int WORLD_WIDTH = 1300;
+    public static final int WORLD_WIDTH = 1600;
     public static final int WORLD_HEIGHT = 800;
 
     /**

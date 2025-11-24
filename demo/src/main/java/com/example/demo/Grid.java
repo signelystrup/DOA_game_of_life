@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import java.util.List;
  * Spatial Hash Grid for efficient entity lookup.
  * Divides the world into cells for fast neighbor queries.
  */
+@Getter
 public class Grid {
     private final int cellSize;
     private final int gridWidth;
@@ -144,8 +147,4 @@ public class Grid {
         if (gridY >= gridHeight) gridY = gridHeight - 1;
         return gridY;
     }
-
-    public int getCellSize() { return cellSize; }
-    public int getGridWidth() { return gridWidth; }
-    public int getGridHeight() { return gridHeight; }
 }
